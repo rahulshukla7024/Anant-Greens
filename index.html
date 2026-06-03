@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#052e1a">
   <title>Anant Greens Plot Inventory</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script> 
+  <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -55,7 +55,7 @@
       border: 1px solid rgba(148, 163, 184, 0.35);
     }
     .map-stage {
-      touch-action: pan-x pan-y;
+      touch-action: pan-y;
       background: #f8faf7;
       background-image:
         linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
@@ -124,8 +124,8 @@
     </div>
   </header>
 
-  <main class="mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
-    <section class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+  <main class="mx-auto flex max-w-[1500px] flex-col px-4 py-6 sm:px-6 lg:px-8">
+    <section class="order-3 mb-5 grid gap-3 sm:grid-cols-2 xl:order-1 xl:grid-cols-4">
       <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <p class="text-xs font-black uppercase tracking-wide text-slate-500">Total Plots</p>
         <p id="totalCount" class="mt-1 text-3xl font-black text-slate-950">0</p>
@@ -144,8 +144,8 @@
       </div>
     </section>
 
-    <section class="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(380px,0.75fr)]">
-      <section class="map-shell rounded-xl p-3 shadow-soft sm:p-4">
+    <section class="order-1 grid gap-6 xl:order-2 xl:grid-cols-[minmax(0,1.25fr)_minmax(380px,0.75fr)]">
+      <section class="map-shell order-2 rounded-xl p-3 shadow-soft sm:p-4 xl:order-1">
         <div class="mb-3 flex flex-col gap-3 text-slate-950 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p class="text-xs font-black uppercase tracking-[0.2em] text-gold">Interactive Layout</p>
@@ -217,8 +217,8 @@
     <rect id="plot-69" x="700.7" y="543.665" width="33.0397" height="68.2438" transform="rotate(25.1796 700.7 543.665)" stroke="white"/>
     <rect id="plot-68" x="670.7" y="529.665" width="33.0397" height="68.2438" transform="rotate(25.1796 670.7 529.665)" stroke="white"/>
     <rect id="plot-67" x="640.7" y="515.665" width="33.0397" height="68.2438" transform="rotate(25.1796 640.7 515.665)" stroke="white"/>
-    <rect id="plot-66" x="580.095" y="487.66" width="33.0397" height="68.2657" transform="rotate(24.0743 580.095 487.66)" stroke="white"/>
-    <rect id="plot-66_2" x="610.818" y="501.641" width="33.0397" height="68.2438" transform="rotate(25.1796 610.818 501.641)" stroke="white"/>
+    <rect id="plot-65" x="580.095" y="487.66" width="33.0397" height="68.2657" transform="rotate(24.0743 580.095 487.66)" stroke="white"/>
+    <rect id="plot-66" x="610.818" y="501.641" width="33.0397" height="68.2438" transform="rotate(25.1796 610.818 501.641)" stroke="white"/>
     <rect id="plot-64" x="550.095" y="473.66" width="33.0397" height="67.2547" transform="rotate(24.0743 550.095 473.66)" stroke="white"/>
     <rect id="plot-63" x="520.095" y="459.66" width="33.0397" height="67.2547" transform="rotate(24.0743 520.095 459.66)" stroke="white"/>
     <rect id="plot-62" x="490.095" y="445.66" width="33.0397" height="67.2547" transform="rotate(24.0743 490.095 445.66)" stroke="white"/>
@@ -296,7 +296,7 @@
         </div>
       </section>
 
-      <aside class="space-y-5">
+      <aside class="order-1 space-y-5 xl:order-2">
         <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
           <div class="grid gap-4 sm:grid-cols-2">
             <label class="block">
@@ -316,7 +316,7 @@
           </div>
         </section>
 
-        <section id="selectedPanel" class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
+        <section id="selectedPanel" class="hidden rounded-xl border border-slate-200 bg-white p-5 shadow-soft md:block">
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-xs font-black uppercase tracking-wide text-slate-500">Selected Plot</p>
@@ -334,32 +334,23 @@
       </aside>
     </section>
 
-    <section class="mt-6">
-      <div class="mb-3 flex items-center justify-between gap-3">
-        <h2 class="text-lg font-black text-slate-950">Inventory Records</h2>
-        <p id="hintText" class="text-sm font-bold text-slate-500">Tap a plot on the map to inspect details.</p>
-      </div>
-
-      <div id="emptyState" class="hidden rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <p class="text-lg font-black text-slate-950">No matching plots</p>
-        <p class="mt-1 text-sm font-medium text-slate-500">Change the search or availability filter.</p>
-      </div>
-
-      <div id="contentState" class="hidden">
-        <div class="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-soft lg:block">
-          <div class="max-h-[58vh] overflow-auto">
-            <table class="min-w-full divide-y divide-slate-200">
-              <thead id="tableHead" class="sticky top-0 z-10 bg-slate-100"></thead>
-              <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
-            </table>
-          </div>
-        </div>
-        <div id="cardList" class="grid gap-3 lg:hidden"></div>
-      </div>
-    </section>
   </main>
 
-  <div id="toastRegion" class="fixed bottom-4 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 sm:w-full" aria-live="polite" aria-atomic="true"></div>
+  <div id="plotModal" class="fixed inset-0 z-50 hidden bg-slate-950/55 p-4 backdrop-blur-sm md:hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="mx-auto mt-10 max-h-[82vh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl">
+      <div class="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-black uppercase tracking-wide text-slate-500">Selected Plot</p>
+          <h2 id="modalTitle" class="mt-1 text-2xl font-black text-slate-950">Plot Details</h2>
+        </div>
+        <button id="modalCloseBtn" type="button" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xl font-black text-slate-700" aria-label="Close plot details">×</button>
+      </div>
+      <span id="modalBadge" class="mb-4 inline-flex rounded-lg bg-slate-100 px-3 py-2 text-xs font-black text-slate-600">None</span>
+      <div id="modalDetails" class="grid gap-3"></div>
+    </div>
+  </div>
+
+  <div id="toastRegion" class="fixed bottom-4 right-4 z-[60] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 sm:w-full" aria-live="polite" aria-atomic="true"></div>
 
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyP9eRQCreNHe0nQie7ACj2lmzy7VBF7zQoC7CxmyfWiR_BXLCAb_A4SH_Zzj8qkFpzrA/exec";
@@ -382,7 +373,9 @@
       statusKey: "status",
       mapDoc: null,
       mapReady: false,
-      zoom: 1
+      zoom: 1,
+      pinchStartDistance: 0,
+      pinchStartZoom: 1
     };
 
     const els = {
@@ -400,14 +393,14 @@
       mapLoading: document.getElementById("mapLoading"),
       errorState: document.getElementById("errorState"),
       errorMessage: document.getElementById("errorMessage"),
-      emptyState: document.getElementById("emptyState"),
-      contentState: document.getElementById("contentState"),
-      tableHead: document.getElementById("tableHead"),
-      tableBody: document.getElementById("tableBody"),
-      cardList: document.getElementById("cardList"),
       selectedTitle: document.getElementById("selectedTitle"),
       selectedBadge: document.getElementById("selectedBadge"),
       selectedDetails: document.getElementById("selectedDetails"),
+      plotModal: document.getElementById("plotModal"),
+      modalCloseBtn: document.getElementById("modalCloseBtn"),
+      modalTitle: document.getElementById("modalTitle"),
+      modalBadge: document.getElementById("modalBadge"),
+      modalDetails: document.getElementById("modalDetails"),
       toastRegion: document.getElementById("toastRegion"),
       totalCount: document.getElementById("totalCount"),
       soldCount: document.getElementById("soldCount"),
@@ -431,6 +424,11 @@
       els.zoomInBtn.addEventListener("click", () => setZoom(state.zoom + 0.12));
       els.zoomOutBtn.addEventListener("click", () => setZoom(state.zoom - 0.12));
       els.zoomResetBtn.addEventListener("click", () => setZoom(1));
+      els.modalCloseBtn.addEventListener("click", closePlotModal);
+      els.plotModal.addEventListener("click", event => {
+        if (event.target === els.plotModal) closePlotModal();
+      });
+      setupPinchZoom();
       initializeMap();
       fetchRows();
     });
@@ -526,13 +524,7 @@
     function render() {
       renderMetrics();
       renderSelectedPanel();
-      renderTable();
-      renderCards();
       renderMap();
-
-      const hasRows = state.filteredRows.length > 0;
-      els.contentState.classList.toggle("hidden", !hasRows);
-      els.emptyState.classList.toggle("hidden", hasRows || state.isLoading);
     }
 
     function renderMetrics() {
@@ -601,9 +593,9 @@
           pointer-events: none;
           fill: #0f172a;
           stroke: rgba(255,255,255,0.88);
-          stroke-width: 5px;
+          stroke-width: 3px;
           paint-order: stroke;
-          font: 950 34px system-ui, -apple-system, Segoe UI, sans-serif;
+          font: 950 13px system-ui, -apple-system, Segoe UI, sans-serif;
           text-anchor: middle;
           dominant-baseline: central;
           opacity: 1;
@@ -644,6 +636,7 @@
           label.dataset.plotId = plotId;
           label.setAttribute("x", box.x + box.width / 2);
           label.setAttribute("y", box.y + box.height / 2);
+          label.style.fontSize = `${getLabelFontSize(box)}px`;
           if (shape.getAttribute("transform")) {
             label.setAttribute("transform", shape.getAttribute("transform"));
           }
@@ -686,6 +679,11 @@
 
     function getPlotShapes() {
       return Array.from(state.mapDoc.querySelectorAll('#Plots-Layer > [id^="plot-"]'));
+    }
+
+    function getLabelFontSize(box) {
+      const shortestSide = Math.max(10, Math.min(box.width, box.height));
+      return Math.max(7, Math.min(14, shortestSide * 0.38));
     }
 
     function getPlotIdFromElement(element) {
@@ -754,82 +752,44 @@
       els.selectedDetails.appendChild(statusWrap);
     }
 
-    function renderTable() {
-      els.tableHead.innerHTML = "";
-      els.tableBody.innerHTML = "";
-      const displayColumns = getDisplayColumns();
-
-      const headerRow = document.createElement("tr");
-      displayColumns.forEach(column => {
-        const th = document.createElement("th");
-        th.scope = "col";
-        th.className = "whitespace-nowrap px-4 py-3 text-left text-xs font-black uppercase tracking-wide text-slate-600";
-        th.textContent = prettifyColumn(column);
-        headerRow.appendChild(th);
-      });
-      els.tableHead.appendChild(headerRow);
-
-      state.filteredRows.forEach(row => {
-        const tr = document.createElement("tr");
-        const rowId = findRowId(row);
-        tr.className = `cursor-pointer transition hover:bg-emerald-50/70 ${state.selectedId === rowId ? "bg-amber-50" : ""}`;
-        tr.addEventListener("click", event => {
-          if (event.target.tagName !== "SELECT") selectPlot(rowId);
-        });
-
-        displayColumns.forEach(column => {
-          const td = document.createElement("td");
-          td.className = "px-4 py-3 align-middle text-sm font-semibold text-slate-700";
-          if (column === state.statusKey) {
-            td.appendChild(renderStatusControl(row));
-          } else {
-            const value = formatCell(row, column);
-            td.className += " whitespace-nowrap";
-            td.textContent = value || "-";
-            td.title = value;
-          }
-          tr.appendChild(td);
-        });
-        els.tableBody.appendChild(tr);
-      });
+    function getPlotDetailItems(row) {
+      return [
+        ["Plot Type", row.plottype ?? row["Plot Type"]],
+        ["Dimensions", formatDimensions(row)],
+        ["Area", formatArea(row)],
+        ["Rate", formatMoney(row.ratepersqunit ?? row["Rate Per Sq.Unit"] ?? row.rate)],
+        ["Total", formatMoney(row.totalamount ?? row["Total Amount"] ?? row.amount)]
+      ];
     }
 
-    function renderCards() {
-      els.cardList.innerHTML = "";
-      state.filteredRows.forEach(row => {
-        const rowId = findRowId(row);
-        const card = document.createElement("article");
-        card.className = `rounded-xl border bg-white p-4 shadow-sm ${state.selectedId === rowId ? "border-gold ring-4 ring-gold/20" : "border-slate-200"}`;
-        card.addEventListener("click", event => {
-          if (event.target.tagName !== "SELECT") selectPlot(rowId);
-        });
+    function openPlotModal(row) {
+      if (!window.matchMedia("(max-width: 767px)").matches) return;
 
-        card.innerHTML = `
-          <div class="mb-4 flex items-start justify-between gap-3">
-            <div>
-              <p class="text-xs font-black uppercase tracking-wide text-slate-500">${escapeHTML(stringifyValue(row.plottype ?? row["Plot Type"] ?? "Plot"))}</p>
-              <h3 class="mt-1 text-xl font-black text-slate-950">Plot #${escapeHTML(rowId)}</h3>
-            </div>
-            <span class="rounded-lg px-3 py-2 text-xs font-black ${getStatusClasses(row[state.statusKey])}">${escapeHTML(stringifyValue(row[state.statusKey]) || "Pending")}</span>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-lg bg-slate-50 p-3"><p class="text-xs font-black uppercase text-slate-500">Dimensions</p><p class="mt-1 font-black">${escapeHTML(formatDimensions(row))}</p></div>
-            <div class="rounded-lg bg-slate-50 p-3"><p class="text-xs font-black uppercase text-slate-500">Area</p><p class="mt-1 font-black">${escapeHTML(formatArea(row))}</p></div>
-          </div>
-        `;
+      const status = stringifyValue(row[state.statusKey]) || "Pending";
+      els.modalTitle.textContent = `Plot #${findRowId(row)}`;
+      els.modalBadge.textContent = status;
+      els.modalBadge.className = `mb-4 inline-flex rounded-lg px-3 py-2 text-xs font-black ${getStatusClasses(status)}`;
+      els.modalDetails.innerHTML = "";
 
-        const statusWrap = document.createElement("div");
-        statusWrap.className = "mt-3";
-        statusWrap.appendChild(renderStatusControl(row));
-        card.appendChild(statusWrap);
-        els.cardList.appendChild(card);
+      getPlotDetailItems(row).forEach(([label, value]) => {
+        const item = document.createElement("div");
+        item.className = "rounded-lg bg-slate-50 p-3";
+        item.innerHTML = `<p class="text-xs font-black uppercase tracking-wide text-slate-500">${escapeHTML(label)}</p><p class="mt-1 break-words text-base font-black text-slate-900">${escapeHTML(value || "-")}</p>`;
+        els.modalDetails.appendChild(item);
       });
+
+      const statusWrap = document.createElement("div");
+      statusWrap.className = "rounded-lg border border-slate-200 p-3";
+      statusWrap.innerHTML = '<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Status</p>';
+      statusWrap.appendChild(renderStatusControl(row));
+      els.modalDetails.appendChild(statusWrap);
+      els.plotModal.classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
     }
 
-    function getDisplayColumns() {
-      const preferred = ["plotno", "plottype", "frontsize", "depthsize", "plotarea", "ratepersqunit", "totalamount", state.statusKey, "svgstatus"];
-      const picked = preferred.filter(column => state.columns.includes(column));
-      return [...picked, ...state.columns.filter(column => !picked.includes(column))].slice(0, 10);
+    function closePlotModal() {
+      els.plotModal.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
     }
 
     function renderStatusControl(row) {
@@ -890,6 +850,9 @@
         row[state.statusKey] = newStatus;
         dismissToast(pendingToast);
         showToast("Status updated successfully!", "success");
+        if (!els.plotModal.classList.contains("hidden")) {
+          openPlotModal(row);
+        }
       } catch (error) {
         row[state.statusKey] = previousStatus;
         if (selectEl) selectEl.value = previousStatus;
@@ -913,6 +876,7 @@
       els.plotFinder.value = normalized;
       render();
       focusMapPlot(normalized);
+      openPlotModal(row);
     }
 
     function focusMapPlot(plotId) {
@@ -938,6 +902,7 @@
       state.statusFilter = "";
       els.searchInput.value = "";
       els.statusFilter.value = "";
+      closePlotModal();
       resetMapViewBox();
       applyFilters();
     }
@@ -980,6 +945,36 @@
     function setZoom(value) {
       state.zoom = Math.max(0.72, Math.min(1.75, value));
       els.mapObject.style.transform = `scale(${state.zoom})`;
+    }
+
+    function setupPinchZoom() {
+      const getDistance = touches => {
+        const [first, second] = touches;
+        return Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+      };
+
+      const startPinch = event => {
+        if (event.touches.length !== 2) return;
+        state.pinchStartDistance = getDistance(event.touches);
+        state.pinchStartZoom = state.zoom;
+      };
+
+      const movePinch = event => {
+        if (event.touches.length !== 2 || !state.pinchStartDistance) return;
+        event.preventDefault();
+        const nextZoom = state.pinchStartZoom * (getDistance(event.touches) / state.pinchStartDistance);
+        setZoom(nextZoom);
+      };
+
+      const endPinch = () => {
+        state.pinchStartDistance = 0;
+      };
+
+      const mapStage = document.getElementById("mapStage");
+      mapStage.addEventListener("touchstart", startPinch, { passive: true });
+      mapStage.addEventListener("touchmove", movePinch, { passive: false });
+      mapStage.addEventListener("touchend", endPinch);
+      mapStage.addEventListener("touchcancel", endPinch);
     }
 
     function getRowById(id) {
