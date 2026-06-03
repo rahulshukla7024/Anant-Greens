@@ -1,0 +1,1099 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#052e1a">
+  <title>Anant Greens Plot Inventory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: "#08351e",
+            leaf: "#166534",
+            gold: "#d4af37",
+            paper: "#f6f8f5"
+          },
+          boxShadow: {
+            soft: "0 22px 55px rgba(15, 23, 42, 0.10)",
+            map: "0 28px 70px rgba(2, 6, 23, 0.24)"
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 9% 3%, rgba(212, 175, 55, 0.18), transparent 23rem),
+        radial-gradient(circle at 88% 18%, rgba(34, 197, 94, 0.13), transparent 24rem),
+        linear-gradient(180deg, #f7faf7 0%, #edf3ef 100%);
+    }
+    .loader, .mini-loader {
+      border-radius: 9999px;
+      animation: spin 0.8s linear infinite;
+    }
+    .loader {
+      width: 2.75rem;
+      height: 2.75rem;
+      border: 4px solid #dce8df;
+      border-top-color: #166534;
+    }
+    .mini-loader {
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      border-top-color: #fff;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .map-shell {
+      background: linear-gradient(180deg, #ffffff 0%, #f4f8f3 100%);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+    .map-stage {
+      touch-action: pan-x pan-y;
+      background: #f8faf7;
+      background-image:
+        linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    #mapObject {
+      transform-origin: center center;
+      transition: transform 180ms ease;
+    }
+    #mapSvg {
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+      display: block;
+      border-radius: 0.5rem;
+      background: #fff;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
+    }
+    select.status-select {
+      background-image:
+        linear-gradient(45deg, transparent 50%, #475569 50%),
+        linear-gradient(135deg, #475569 50%, transparent 50%);
+      background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+      background-repeat: no-repeat;
+      background-size: 5px 5px, 5px 5px;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900 antialiased">
+  <header class="relative z-40 border-b border-gold/40 bg-forest text-white shadow-lg lg:sticky lg:top-0">
+    <div class="mx-auto max-w-[1500px] px-4 py-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-end gap-x-3 gap-y-1">
+            <h1 class="text-2xl font-black tracking-tight sm:text-3xl">Anant <span class="text-gold">Greens</span></h1>
+            <span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-emerald-50">Plot Map Inventory</span>
+          </div>
+          <p class="mt-1 text-sm font-medium text-emerald-100/85">Premium smart township development • Shri Anant Creation</p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-[1fr_auto] xl:w-[780px]">
+          <label class="relative block" for="searchInput">
+            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.3-4.3m1.3-5.7a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"></path>
+              </svg>
+            </span>
+            <input id="searchInput" type="search" autocomplete="off" placeholder="Search plot, type, size, status..."
+              class="h-12 w-full rounded-lg border border-white/15 bg-white py-3 pl-10 pr-4 text-base font-semibold text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-gold focus:ring-4 focus:ring-gold/20">
+          </label>
+
+          <div class="flex items-center justify-between gap-3 rounded-lg border border-white/15 bg-white/10 p-2">
+            <div class="whitespace-nowrap text-right">
+              <p class="text-[11px] font-bold uppercase tracking-wide text-emerald-100/70">Admin Lock</p>
+              <p id="modeLabel" class="text-sm font-black text-white">Locked</p>
+            </div>
+            <label class="relative inline-flex cursor-pointer items-center" for="adminToggle">
+              <input id="adminToggle" type="checkbox" class="peer sr-only" aria-label="Toggle admin mode">
+              <span class="h-8 w-14 rounded-full bg-white/25 transition peer-checked:bg-gold peer-focus:outline peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-gold"></span>
+              <span class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition peer-checked:translate-x-6"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
+    <section class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Total Plots</p>
+        <p id="totalCount" class="mt-1 text-3xl font-black text-slate-950">0</p>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Sold</p>
+        <p id="soldCount" class="mt-1 text-3xl font-black text-rose-700">0</p>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Available</p>
+        <p id="availableCount" class="mt-1 text-3xl font-black text-sky-700">0</p>
+      </div>
+      <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500">In Talk</p>
+        <p id="inTalkCount" class="mt-1 text-3xl font-black text-amber-700">0</p>
+      </div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(380px,0.75fr)]">
+      <section class="map-shell rounded-xl p-3 shadow-soft sm:p-4">
+        <div class="mb-3 flex flex-col gap-3 text-slate-950 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-gold">Interactive Layout</p>
+            <h2 class="mt-1 text-xl font-black">Live Plot Availability Map</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="zoomOutBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-black transition hover:bg-slate-100" aria-label="Zoom out">-</button>
+            <button id="zoomResetBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-black transition hover:bg-slate-100">Reset</button>
+            <button id="zoomInBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-black transition hover:bg-slate-100" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+
+        <div id="mapStage" class="map-stage relative h-[64vh] min-h-[520px] overflow-auto rounded-lg border border-slate-200 p-4 sm:h-[72vh]">
+          <div id="mapLoading" class="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] transition-opacity duration-300">
+            <div class="flex flex-col items-center gap-4 text-center text-white">
+              <div class="loader"></div>
+              <p class="text-sm font-bold">Loading plot map and sheet data</p>
+            </div>
+          </div>
+          <div id="mapObject" class="mx-auto flex h-full w-full items-center justify-center rounded-md">
+<svg id="mapSvg" width="1136" height="1600" viewBox="0 0 1136 1600" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <image id="layout-base" decoding="async" width="1136" height="1600" preserveAspectRatio="none" href="Screenshot 2026-06-04 at 12.47.47 AM.jpg" xlink:href="Screenshot 2026-06-04 at 12.47.47 AM.jpg"/>
+  <g id="Plots-Layer" opacity="1">
+    <path id="plot-114" d="M1013.5 307L1010 391.5L970.5 373L1000.5 303.5L1013.5 307Z" stroke="white"/>
+    <path id="plot-113" d="M968.5 294.5L1000.5 304L971.5 373.5L940.5 358.5L968.5 294.5Z" stroke="white"/>
+    <path id="plot-112" d="M968.5 294.5L937.5 283.5L909.5 344.5L941 358.5L968.5 294.5Z" stroke="white"/>
+    <path id="plot-111" d="M937.5 283.5L907.5 271L880 331L909.5 344.5L937.5 283.5Z" stroke="white"/>
+    <path id="plot-110" d="M907.5 271L875.5 259L849 317.5L880 331L907.5 271Z" stroke="white"/>
+    <path id="plot-109" d="M875.5 259L844.5 247.5L819 303.5L849.5 317.5L875.5 259Z" stroke="white"/>
+    <path id="plot-108" d="M812.5 237L813.052 237.178M813.052 237.178L845 247.5L819 304L789 289L813.052 237.178Z" stroke="white"/>
+    <path id="plot-107" d="M813 237.5L781 225.5L758 275L789 290L813 237.5Z" stroke="white"/>
+    <path id="plot-106" d="M1009.5 421L976.5 405L948.5 470L1009.5 498V421Z" stroke="white"/>
+    <rect id="plot-105" x="945.938" y="391.274" width="33.549" height="70.009" transform="rotate(23.8239 945.938 391.274)" stroke="white"/>
+    <rect id="plot-104" x="915.938" y="377.659" width="33.549" height="70.009" transform="rotate(23.8239 915.938 377.659)" stroke="white"/>
+    <rect id="plot-103" x="885.938" y="364.045" width="33.549" height="70.009" transform="rotate(23.8239 885.938 364.045)" stroke="white"/>
+    <path id="plot-102" d="M1009 497.5V548.5L984 562.5L951 546L978.5 483.5L1009 497.5Z" stroke="white"/>
+    <rect id="plot-101" x="950.225" y="470.659" width="31.354" height="68.2438" transform="rotate(23.8239 950.225 470.659)" stroke="white"/>
+    <rect id="plot-100" x="919.225" y="456.659" width="33.3906" height="68.2438" transform="rotate(23.8239 919.225 456.659)" stroke="white"/>
+    <rect id="plot-99" x="888.225" y="442.659" width="33.3906" height="68.2438" transform="rotate(23.8239 888.225 442.659)" stroke="white"/>
+    <rect id="plot-98" x="857.225" y="428.659" width="33.3906" height="68.2438" transform="rotate(23.8239 857.225 428.659)" stroke="white"/>
+    <rect id="plot-97" x="825.225" y="336.659" width="33.3906" height="68.2438" transform="rotate(23.8239 825.225 336.659)" stroke="white"/>
+    <rect id="plot-96" x="795.225" y="322.659" width="33.3906" height="68.2438" transform="rotate(23.8239 795.225 322.659)" stroke="white"/>
+    <rect id="plot-95" x="765.225" y="308.659" width="33.3906" height="68.2438" transform="rotate(23.8239 765.225 308.659)" stroke="white"/>
+    <rect id="plot-94" x="735.225" y="294.659" width="33.3906" height="68.2438" transform="rotate(23.8239 735.225 294.659)" stroke="white"/>
+    <rect id="plot-93" x="705.225" y="280.659" width="33.3906" height="68.2438" transform="rotate(23.8239 705.225 280.659)" stroke="white"/>
+    <rect id="plot-92" x="675.225" y="266.659" width="33.3906" height="68.2438" transform="rotate(23.8239 675.225 266.659)" stroke="white"/>
+    <rect id="plot-91" x="645.225" y="252.659" width="33.3906" height="68.2438" transform="rotate(23.8239 645.225 252.659)" stroke="white"/>
+    <rect id="plot-90" x="615.225" y="238.659" width="33.3906" height="68.2438" transform="rotate(23.8239 615.225 238.659)" stroke="white"/>
+    <rect id="plot-89" x="585.225" y="224.659" width="33.3906" height="68.2438" transform="rotate(23.8239 585.225 224.659)" stroke="white"/>
+    <rect id="plot-88" x="797.225" y="399.659" width="33.3906" height="68.2438" transform="rotate(23.8239 797.225 399.659)" stroke="white"/>
+    <rect id="plot-87" x="767.225" y="385.659" width="33.3906" height="68.2438" transform="rotate(23.8239 767.225 385.659)" stroke="white"/>
+    <rect id="plot-86" x="737.225" y="371.659" width="33.3906" height="68.2438" transform="rotate(23.8239 737.225 371.659)" stroke="white"/>
+    <rect id="plot-85" x="707.225" y="357.659" width="33.3906" height="68.2438" transform="rotate(23.8239 707.225 357.659)" stroke="white"/>
+    <rect id="plot-84" x="677.225" y="343.659" width="33.3906" height="68.2438" transform="rotate(23.8239 677.225 343.659)" stroke="white"/>
+    <rect id="plot-83" x="647.225" y="329.659" width="33.3906" height="68.2438" transform="rotate(23.8239 647.225 329.659)" stroke="white"/>
+    <rect id="plot-82" x="617.225" y="315.659" width="33.3906" height="68.2438" transform="rotate(23.8239 617.225 315.659)" stroke="white"/>
+    <rect id="plot-81" x="587.225" y="301.659" width="33.3906" height="68.2438" transform="rotate(23.8239 587.225 301.659)" stroke="white"/>
+    <rect id="plot-80" x="557.225" y="287.659" width="33.3906" height="68.2438" transform="rotate(23.8239 557.225 287.659)" stroke="white"/>
+    <rect id="plot-79" x="757.225" y="494.659" width="33.3906" height="68.2438" transform="rotate(23.8239 757.225 494.659)" stroke="white"/>
+    <rect id="plot-78" x="727.225" y="480.659" width="33.3906" height="68.2438" transform="rotate(23.8239 727.225 480.659)" stroke="white"/>
+    <rect id="plot-77" x="697.225" y="466.659" width="33.3906" height="68.2438" transform="rotate(23.8239 697.225 466.659)" stroke="white"/>
+    <rect id="plot-76" x="667.225" y="452.659" width="33.3906" height="68.2438" transform="rotate(23.8239 667.225 452.659)" stroke="white"/>
+    <rect id="plot-75" x="637.225" y="438.659" width="33.3906" height="68.2438" transform="rotate(23.8239 637.225 438.659)" stroke="white"/>
+    <rect id="plot-74" x="607.225" y="424.659" width="33.3906" height="68.2438" transform="rotate(23.8239 607.225 424.659)" stroke="white"/>
+    <rect id="plot-73" x="577.225" y="410.659" width="33.3906" height="68.2438" transform="rotate(23.8239 577.225 410.659)" stroke="white"/>
+    <rect id="plot-72" x="547.225" y="396.659" width="33.3906" height="68.2438" transform="rotate(23.8239 547.225 396.659)" stroke="white"/>
+    <rect id="plot-71" x="517.225" y="382.659" width="33.3906" height="68.2438" transform="rotate(23.8239 517.225 382.659)" stroke="white"/>
+    <rect id="plot-70" x="730.7" y="557.665" width="33.0397" height="68.2438" transform="rotate(25.1796 730.7 557.665)" stroke="white"/>
+    <rect id="plot-69" x="700.7" y="543.665" width="33.0397" height="68.2438" transform="rotate(25.1796 700.7 543.665)" stroke="white"/>
+    <rect id="plot-68" x="670.7" y="529.665" width="33.0397" height="68.2438" transform="rotate(25.1796 670.7 529.665)" stroke="white"/>
+    <rect id="plot-67" x="640.7" y="515.665" width="33.0397" height="68.2438" transform="rotate(25.1796 640.7 515.665)" stroke="white"/>
+    <rect id="plot-66" x="580.095" y="487.66" width="33.0397" height="68.2657" transform="rotate(24.0743 580.095 487.66)" stroke="white"/>
+    <rect id="plot-66_2" x="610.818" y="501.641" width="33.0397" height="68.2438" transform="rotate(25.1796 610.818 501.641)" stroke="white"/>
+    <rect id="plot-64" x="550.095" y="473.66" width="33.0397" height="67.2547" transform="rotate(24.0743 550.095 473.66)" stroke="white"/>
+    <rect id="plot-63" x="520.095" y="459.66" width="33.0397" height="67.2547" transform="rotate(24.0743 520.095 459.66)" stroke="white"/>
+    <rect id="plot-62" x="490.095" y="445.66" width="33.0397" height="67.2547" transform="rotate(24.0743 490.095 445.66)" stroke="white"/>
+    <rect id="plot-61" x="704.095" y="659.66" width="33.0397" height="67.2547" transform="rotate(24.0743 704.095 659.66)" stroke="white"/>
+    <rect id="plot-60" x="673.095" y="645.66" width="33.0397" height="67.2547" transform="rotate(24.0743 673.095 645.66)" stroke="white"/>
+    <rect id="plot-59" x="642.095" y="631.66" width="33.0397" height="67.2547" transform="rotate(24.0743 642.095 631.66)" stroke="white"/>
+    <rect id="plot-58" x="577.095" y="599.917" width="33.0397" height="67.2547" transform="rotate(24.0743 577.095 599.917)" stroke="white"/>
+    <rect id="plot-57" x="547.095" y="585.66" width="33.0397" height="67.2547" transform="rotate(24.0743 547.095 585.66)" stroke="white"/>
+    <rect id="plot-56" x="517.095" y="571.404" width="33.0397" height="67.2547" transform="rotate(24.0743 517.095 571.404)" stroke="white"/>
+    <path id="plot-55" d="M516.5 571.5L489 558L482 575L472.5 600.5L463 620.5L489 633.5L516.5 571.5Z" stroke="white"/>
+    <rect id="plot-54" x="675.874" y="721.66" width="33.0397" height="69.164" transform="rotate(24.0743 675.874 721.66)" stroke="white"/>
+    <rect id="plot-53" x="645.874" y="707.66" width="33.0397" height="69.164" transform="rotate(24.0743 645.874 707.66)" stroke="white"/>
+    <rect id="plot-52" x="615.874" y="693.66" width="33.0397" height="69.164" transform="rotate(24.0743 615.874 693.66)" stroke="white"/>
+    <rect id="plot-51" x="549.874" y="661.641" width="33.368" height="69.164" transform="rotate(24.0743 549.874 661.641)" stroke="white"/>
+    <rect id="plot-50" x="518.865" y="646.66" width="34.2845" height="69.1427" transform="rotate(24.0743 518.865 646.66)" stroke="white"/>
+    <rect id="plot-49" x="488.931" y="633.655" width="32.5327" height="69.1427" transform="rotate(22.9662 488.931 633.655)" stroke="white"/>
+    <path id="plot-48" d="M489 633.5L463.5 621.5L454.5 637.5L444 656.5L431 682L463.5 697L489 633.5Z" stroke="white"/>
+    <path id="plot-47" d="M639.5 893L666 830.5L635.5 816L607.5 877L639.5 893Z" stroke="white"/>
+    <rect id="plot-46" x="605.622" y="801.662" width="33.0445" height="67.3407" transform="rotate(24.5312 605.622 801.662)" stroke="white"/>
+    <rect id="plot-45" x="575.622" y="787.662" width="33.0445" height="67.3407" transform="rotate(24.5312 575.622 787.662)" stroke="white"/>
+    <rect id="plot-44" x="509.984" y="757.531" width="33.0445" height="67.3407" transform="rotate(24.5312 509.984 757.531)" stroke="white"/>
+    <rect id="plot-43" x="479.869" y="743.663" width="33.0445" height="67.3407" transform="rotate(24.7619 479.869 743.663)" stroke="white"/>
+    <rect id="plot-42" x="449.694" y="728.663" width="32.5327" height="67.3407" transform="rotate(24.5991 449.694 728.663)" stroke="white"/>
+    <path id="plot-41" d="M450.5 728.5L416.5 712.5L399.5 746.5L395 761L387 774L422 790L450.5 728.5Z" stroke="white"/>
+    <path id="plot-40" d="M627.5 919L640 893L607.5 877.5L580.5 939.5L627.5 962V919Z" stroke="white"/>
+    <rect id="plot-39" x="578.214" y="863.528" width="32.5327" height="68.5753" transform="rotate(23.6925 578.214 863.528)" stroke="white"/>
+    <rect id="plot-38" x="548.965" y="849.795" width="32.5327" height="69.3838" transform="rotate(24.0752 548.965 849.795)" stroke="white"/>
+    <rect id="plot-37" x="482.543" y="819.662" width="32.5327" height="67.3407" transform="rotate(24.4578 482.543 819.662)" stroke="white"/>
+    <rect id="plot-36" x="452.953" y="805.664" width="32.5327" height="67.3407" transform="rotate(24.8405 452.953 805.664)" stroke="white"/>
+    <rect id="plot-35" x="423.332" y="791.706" width="32.5327" height="67.3407" transform="rotate(25.2232 423.332 791.706)" stroke="white"/>
+    <path id="plot-34" d="M423 791L387.5 774.5L353 833L395 853.5L423 791Z" stroke="white"/>
+    <path id="plot-33" d="M629 1000.5L598 986.5L569 1047.5L627.5 1076L629 1000.5Z" stroke="white"/>
+    <rect id="plot-32" x="568.602" y="971.642" width="32.5327" height="67.3407" transform="rotate(26.0449 568.602 971.642)" stroke="white"/>
+    <rect id="plot-31" x="538.486" y="957.666" width="32.5327" height="67.3407" transform="rotate(25.339 538.486 957.666)" stroke="white"/>
+    <rect id="plot-30" x="508.432" y="943.615" width="32.5327" height="67.3407" transform="rotate(24.6332 508.432 943.615)" stroke="white"/>
+    <rect id="plot-29" x="441.845" y="911.332" width="33.9599" height="69.4929" transform="rotate(23.9273 441.845 911.332)" stroke="white"/>
+    <rect id="plot-28" x="413.255" y="898.66" width="31.1802" height="68.0404" transform="rotate(23.9273 413.255 898.66)" stroke="white"/>
+    <rect id="plot-27" x="381.855" y="884.703" width="33.9599" height="68.0404" transform="rotate(23.9273 381.855 884.703)" stroke="white"/>
+    <path id="plot-26" d="M381.5 885L338 864L312.5 927.5L354 946.5L381.5 885Z" stroke="white"/>
+    <path id="plot-25" d="M599.5 1062.5L627.5 1075.5L626 1151L572.5 1125L599.5 1062.5Z" stroke="white"/>
+    <path id="plot-24" d="M572.5 1125L600 1062.5L569.5 1048.5L542.5 1111L572.5 1125Z" stroke="white"/>
+    <path id="plot-23" d="M543 1111L570 1048L540 1034L513 1096.5L543 1111Z" stroke="white"/>
+    <path id="plot-22" d="M512.5 1097L540 1033.5L510.5 1020L482 1083L512.5 1097Z" stroke="white"/>
+    <path id="plot-21" d="M453 1068L480.5 1006.5L510.5 1020L482.5 1083L453 1068Z" stroke="white"/>
+    <path id="plot-20" d="M416.5 1052L444 989L414 975.5L387 1037.5L416.5 1052Z" stroke="white"/>
+    <path id="plot-19" d="M387 1037.5L414 975L384.5 961L357 1023L387 1037.5Z" stroke="white"/>
+    <path id="plot-18" d="M357.5 1023.5L384.5 961L354.5 947L326.5 1009.5L357.5 1023.5Z" stroke="white"/>
+    <path id="plot-17" d="M326.5 1009.5L289.5 992L312.5 927.5L355 947L326.5 1009.5Z" stroke="white"/>
+    <path id="plot-16" d="M375.5 1148L403.5 1083.5L373.5 1069.5L345.5 1133.5L375.5 1148Z" stroke="white"/>
+    <path id="plot-15" d="M345.5 1133.5L373.5 1069.5L344 1055.5L314.5 1119L345.5 1133.5Z" stroke="white"/>
+    <path id="plot-14" d="M315 1119.5L344 1055.5L313.5 1041L286 1104.5L315 1119.5Z" stroke="white"/>
+    <path id="plot-13" d="M313.5 1041L278 1025L254 1088.5L286 1104.5L313.5 1041Z" stroke="white"/>
+    <path id="plot-12" d="M624.5 1224V1296H590.5V1224H624.5Z" stroke="white"/>
+    <path id="plot-11" d="M591.5 1224H557.5V1296H591.5V1224Z" stroke="white"/>
+    <path id="plot-10" d="M557.5 1296.5V1224.5H525.5V1296.5H557.5Z" stroke="white"/>
+    <path id="plot-9" d="M525 1296V1225H492L492.985 1296H525Z" stroke="white"/>
+    <path id="plot-8" d="M492.5 1296L491.515 1225H459.5V1296H492.5Z" stroke="white"/>
+    <path id="plot-7" d="M459 1296V1225H425L426 1296H459Z" stroke="white"/>
+    <path id="plot-6" d="M424.03 1225H393V1296H425L424.03 1225Z" stroke="white"/>
+    <path id="plot-5" d="M353.5 1227H320.5V1296H354.5L353.5 1227Z" stroke="white"/>
+    <path id="plot-4" d="M320.5 1296V1227H287.5V1296H320.5Z" stroke="white"/>
+    <path id="plot-3" d="M287.5 1296V1227H254.5V1296H287.5Z" stroke="white"/>
+    <path id="plot-2" d="M255 1296V1227H221V1296H255Z" stroke="white"/>
+    <path id="plot-1" d="M220.5 1296H169.5L198.5 1227H220.5V1296Z" stroke="white"/>
+  </g>
+</svg>
+
+          </div>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-700">
+          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-sky-500"></span>Available</span>
+          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-amber-400"></span>In Talk</span>
+          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-rose-500"></span>Sold</span>
+        </div>
+      </section>
+
+      <aside class="space-y-5">
+        <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="block">
+              <span class="text-xs font-black uppercase tracking-wide text-slate-500">Availability</span>
+              <select id="statusFilter" class="mt-2 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+                <option value="">All Assets</option>
+              </select>
+            </label>
+            <label class="block">
+              <span class="text-xs font-black uppercase tracking-wide text-slate-500">Find Plot #</span>
+              <input id="plotFinder" inputmode="numeric" placeholder="77" class="mt-2 h-12 w-full rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+            </label>
+          </div>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <button id="clearBtn" type="button" class="h-11 rounded-lg border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-700 transition hover:bg-slate-200">Clear Selection</button>
+            <button id="refreshBtn" type="button" class="h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf">Refresh Sheet</button>
+          </div>
+        </section>
+
+        <section id="selectedPanel" class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-black uppercase tracking-wide text-slate-500">Selected Plot</p>
+              <h2 id="selectedTitle" class="mt-1 text-2xl font-black text-slate-950">Select a plot</h2>
+            </div>
+            <span id="selectedBadge" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-black text-slate-600">None</span>
+          </div>
+          <div id="selectedDetails" class="mt-5 grid gap-3"></div>
+        </section>
+
+        <section id="errorState" class="hidden rounded-xl border border-red-200 bg-red-50 p-5 shadow-sm">
+          <p class="font-black text-red-900">Unable to load database</p>
+          <p id="errorMessage" class="mt-1 text-sm font-medium text-red-700">Please check the deployment URL.</p>
+        </section>
+      </aside>
+    </section>
+
+    <section class="mt-6">
+      <div class="mb-3 flex items-center justify-between gap-3">
+        <h2 class="text-lg font-black text-slate-950">Inventory Records</h2>
+        <p id="hintText" class="text-sm font-bold text-slate-500">Tap a plot on the map to inspect details.</p>
+      </div>
+
+      <div id="emptyState" class="hidden rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <p class="text-lg font-black text-slate-950">No matching plots</p>
+        <p class="mt-1 text-sm font-medium text-slate-500">Change the search or availability filter.</p>
+      </div>
+
+      <div id="contentState" class="hidden">
+        <div class="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-soft lg:block">
+          <div class="max-h-[58vh] overflow-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+              <thead id="tableHead" class="sticky top-0 z-10 bg-slate-100"></thead>
+              <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="cardList" class="grid gap-3 lg:hidden"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toastRegion" class="fixed bottom-4 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 sm:w-full" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyP9eRQCreNHe0nQie7ACj2lmzy7VBF7zQoC7CxmyfWiR_BXLCAb_A4SH_Zzj8qkFpzrA/exec";
+
+    const STATUS_OPTIONS = ["Available", "In Talk", "Sold", "Pending", "In Progress"];
+    const ID_KEYS = ["rowId", "rowID", "Row ID", "RowID", "id", "ID", "Id", "plotno", "Plot No", "plotId", "Plot ID", "serial", "Serial", "S.No", "S No"];
+    const STATUS_KEYS = ["status", "Status", "STATUS", "currentStatus", "Current Status"];
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    const state = {
+      rows: [],
+      filteredRows: [],
+      columns: [],
+      query: "",
+      statusFilter: "",
+      isAdmin: false,
+      isLoading: false,
+      selectedId: "",
+      updatingIds: new Set(),
+      statusKey: "status",
+      mapDoc: null,
+      mapReady: false,
+      zoom: 1
+    };
+
+    const els = {
+      adminToggle: document.getElementById("adminToggle"),
+      modeLabel: document.getElementById("modeLabel"),
+      searchInput: document.getElementById("searchInput"),
+      statusFilter: document.getElementById("statusFilter"),
+      plotFinder: document.getElementById("plotFinder"),
+      clearBtn: document.getElementById("clearBtn"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      zoomInBtn: document.getElementById("zoomInBtn"),
+      zoomOutBtn: document.getElementById("zoomOutBtn"),
+      zoomResetBtn: document.getElementById("zoomResetBtn"),
+      mapObject: document.getElementById("mapObject"),
+      mapLoading: document.getElementById("mapLoading"),
+      errorState: document.getElementById("errorState"),
+      errorMessage: document.getElementById("errorMessage"),
+      emptyState: document.getElementById("emptyState"),
+      contentState: document.getElementById("contentState"),
+      tableHead: document.getElementById("tableHead"),
+      tableBody: document.getElementById("tableBody"),
+      cardList: document.getElementById("cardList"),
+      selectedTitle: document.getElementById("selectedTitle"),
+      selectedBadge: document.getElementById("selectedBadge"),
+      selectedDetails: document.getElementById("selectedDetails"),
+      toastRegion: document.getElementById("toastRegion"),
+      totalCount: document.getElementById("totalCount"),
+      soldCount: document.getElementById("soldCount"),
+      availableCount: document.getElementById("availableCount"),
+      inTalkCount: document.getElementById("inTalkCount")
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      els.adminToggle.addEventListener("change", handleAdminToggle);
+      els.searchInput.addEventListener("input", event => {
+        state.query = event.target.value.trim().toLowerCase();
+        applyFilters();
+      });
+      els.statusFilter.addEventListener("change", event => {
+        state.statusFilter = event.target.value;
+        applyFilters();
+      });
+      els.plotFinder.addEventListener("input", handlePlotFinder);
+      els.clearBtn.addEventListener("click", clearSelection);
+      els.refreshBtn.addEventListener("click", fetchRows);
+      els.zoomInBtn.addEventListener("click", () => setZoom(state.zoom + 0.12));
+      els.zoomOutBtn.addEventListener("click", () => setZoom(state.zoom - 0.12));
+      els.zoomResetBtn.addEventListener("click", () => setZoom(1));
+      initializeMap();
+      fetchRows();
+    });
+
+    async function fetchRows() {
+      setLoading(true);
+      hideError();
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, { method: "GET", cache: "no-store" });
+        if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+
+        const payload = await response.json();
+        const rows = normalizeResponse(payload);
+        state.rows = rows.map((row, index) => ({ ...row, __clientRowIndex: index + 1 }));
+        state.columns = getColumns(state.rows);
+        state.statusKey = findStatusKey(state.columns);
+        populateStatusFilter();
+        applyFilters();
+      } catch (error) {
+        state.rows = [];
+        state.filteredRows = [];
+        render();
+        showError(error.message || "Unknown loading error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function normalizeResponse(payload) {
+      const rows = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload?.rows)
+            ? payload.rows
+            : [];
+
+      return rows
+        .filter(item => item && typeof item === "object" && !Array.isArray(item))
+        .map(item => Object.fromEntries(Object.entries(item).filter(([key]) => !key.startsWith("__"))));
+    }
+
+    function getColumns(rows) {
+      const seen = new Set();
+      rows.forEach(row => Object.keys(row).forEach(key => {
+        if (!key.startsWith("__")) seen.add(key);
+      }));
+
+      const columns = Array.from(seen);
+      const statusKey = findStatusKey(columns);
+      return statusKey ? [...columns.filter(column => column !== statusKey), statusKey] : columns;
+    }
+
+    function findStatusKey(columns) {
+      return STATUS_KEYS.find(key => columns.includes(key))
+        || columns.find(key => key.toLowerCase().trim() === "status")
+        || "status";
+    }
+
+    function findRowId(row) {
+      for (const key of ID_KEYS) {
+        if (row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") {
+          return String(row[key]).trim();
+        }
+      }
+      return String(row.__clientRowIndex);
+    }
+
+    function populateStatusFilter() {
+      const statuses = Array.from(new Set(state.rows.map(row => stringifyValue(row[state.statusKey]).trim()).filter(Boolean))).sort();
+      els.statusFilter.innerHTML = '<option value="">All Assets</option>';
+      statuses.forEach(status => {
+        const option = document.createElement("option");
+        option.value = status;
+        option.textContent = status;
+        els.statusFilter.appendChild(option);
+      });
+      if (state.statusFilter) els.statusFilter.value = state.statusFilter;
+    }
+
+    function applyFilters() {
+      state.filteredRows = state.rows.filter(row => {
+        const matchesText = !state.query || Object.entries(row).some(([key, value]) =>
+          !key.startsWith("__") && stringifyValue(value).toLowerCase().includes(state.query)
+        );
+        const matchesStatus = !state.statusFilter || stringifyValue(row[state.statusKey]) === state.statusFilter;
+        return matchesText && matchesStatus;
+      });
+      render();
+    }
+
+    function render() {
+      renderMetrics();
+      renderSelectedPanel();
+      renderTable();
+      renderCards();
+      renderMap();
+
+      const hasRows = state.filteredRows.length > 0;
+      els.contentState.classList.toggle("hidden", !hasRows);
+      els.emptyState.classList.toggle("hidden", hasRows || state.isLoading);
+    }
+
+    function renderMetrics() {
+      const available = state.rows.filter(row => normalizeStatus(row[state.statusKey]) === "available").length;
+      const sold = state.rows.filter(row => normalizeStatus(row[state.statusKey]) === "sold").length;
+      const inTalk = state.rows.filter(row => normalizeStatus(row[state.statusKey]) === "in-talk").length;
+      els.totalCount.textContent = state.rows.length;
+      els.availableCount.textContent = available;
+      els.soldCount.textContent = sold;
+      els.inTalkCount.textContent = inTalk;
+    }
+
+    function initializeMap() {
+      if (state.mapReady) return;
+
+      try {
+        state.mapDoc = document;
+
+        const svg = state.mapDoc.getElementById("mapSvg");
+        const plotLayer = state.mapDoc.getElementById("Plots-Layer");
+        if (svg) {
+          svg.style.display = "block";
+          svg.style.overflow = "visible";
+        }
+        if (plotLayer) plotLayer.style.opacity = "1";
+
+        preparePlotShapes();
+        state.mapReady = true;
+        hideMapLoader();
+        renderMap();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        if (state.mapReady) hideMapLoader();
+      }
+    }
+
+    function hideMapLoader() {
+      els.mapLoading.classList.add("opacity-0", "pointer-events-none");
+      window.setTimeout(() => els.mapLoading.classList.add("hidden"), 320);
+    }
+
+    function preparePlotShapes() {
+      const style = state.mapDoc.createElementNS(SVG_NS, "style");
+      style.textContent = `
+        #Plots-Layer > [id^="plot-"] {
+          cursor: pointer;
+          stroke: rgba(255,255,255,0.95) !important;
+          stroke-width: 2.1px !important;
+          vector-effect: non-scaling-stroke;
+          transition: fill 160ms ease, opacity 160ms ease, stroke 160ms ease;
+        }
+        #Plots-Layer > [id^="plot-"]:hover {
+          opacity: 1 !important;
+          stroke: #ffffff !important;
+          stroke-width: 4px !important;
+          filter: drop-shadow(0 0 7px rgba(255,255,255,0.8));
+        }
+        .plot-selected {
+          stroke: #ffffff !important;
+          stroke-width: 5px !important;
+          opacity: 1 !important;
+          filter: drop-shadow(0 0 12px rgba(250,204,21,0.95));
+        }
+        .plot-label {
+          pointer-events: none;
+          fill: #0f172a;
+          stroke: rgba(255,255,255,0.88);
+          stroke-width: 5px;
+          paint-order: stroke;
+          font: 950 34px system-ui, -apple-system, Segoe UI, sans-serif;
+          text-anchor: middle;
+          dominant-baseline: central;
+          opacity: 1;
+        }
+      `;
+      state.mapDoc.getElementById("mapSvg")?.prepend(style);
+
+      getPlotShapes().forEach(shape => {
+        const plotId = getPlotIdFromElement(shape);
+        shape.addEventListener("click", () => selectPlot(plotId));
+        shape.setAttribute("tabindex", "0");
+        shape.setAttribute("role", "button");
+        shape.setAttribute("aria-label", `Plot ${plotId}`);
+        shape.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") selectPlot(plotId);
+        });
+      });
+
+      addPlotLabels();
+    }
+
+    function addPlotLabels() {
+      const svg = state.mapDoc.getElementById("mapSvg");
+      let labelLayer = state.mapDoc.getElementById("map-labels");
+      if (!svg || labelLayer) return;
+
+      labelLayer = state.mapDoc.createElementNS(SVG_NS, "g");
+      labelLayer.id = "map-labels";
+      svg.appendChild(labelLayer);
+
+      getPlotShapes().forEach(shape => {
+        const plotId = getPlotIdFromElement(shape);
+        if (shape.id.includes("_")) return;
+        try {
+          const label = state.mapDoc.createElementNS(SVG_NS, "text");
+          const box = shape.getBBox();
+          label.classList.add("plot-label");
+          label.dataset.plotId = plotId;
+          label.setAttribute("x", box.x + box.width / 2);
+          label.setAttribute("y", box.y + box.height / 2);
+          if (shape.getAttribute("transform")) {
+            label.setAttribute("transform", shape.getAttribute("transform"));
+          }
+          label.textContent = plotId;
+          labelLayer.appendChild(label);
+        } catch (error) {
+          console.warn("Unable to label", shape.id, error);
+        }
+      });
+    }
+
+    function renderMap() {
+      if (!state.mapReady || !state.mapDoc) return;
+
+      const visibleIds = new Set(state.filteredRows.map(findRowId));
+      getPlotShapes().forEach(shape => {
+        const plotId = getPlotIdFromElement(shape);
+        const row = getRowById(plotId);
+        const visible = visibleIds.has(plotId);
+        const selected = state.selectedId === plotId;
+        shape.style.fill = getMapFill(row?.[state.statusKey]);
+        shape.style.fillOpacity = visible ? "0.78" : "0.16";
+        shape.style.opacity = visible ? "1" : "0.35";
+        shape.classList.toggle("plot-selected", selected);
+      });
+
+      const labelLayer = state.mapDoc.getElementById("map-labels");
+      if (labelLayer) {
+        labelLayer.querySelectorAll("text").forEach(label => {
+          const plotId = label.dataset.plotId || label.textContent.trim();
+          const visible = visibleIds.has(plotId);
+          const row = getRowById(plotId);
+          const colors = getLabelColors(row?.[state.statusKey]);
+          label.style.fill = colors.fill;
+          label.style.stroke = colors.stroke;
+          label.style.opacity = visible ? "1" : "0.24";
+        });
+      }
+    }
+
+    function getPlotShapes() {
+      return Array.from(state.mapDoc.querySelectorAll('#Plots-Layer > [id^="plot-"]'));
+    }
+
+    function getPlotIdFromElement(element) {
+      return String(element.id || "").replace(/^plot-/, "").replace(/_.+$/, "");
+    }
+
+    function getMapFill(status) {
+      switch (normalizeStatus(status)) {
+        case "sold": return "#ef4444";
+        case "in-talk": return "#f59e0b";
+        case "available": return "#3b82f6";
+        case "pending": return "#a855f7";
+        case "in-progress": return "#6366f1";
+        default: return "#64748b";
+      }
+    }
+
+    function getLabelColors(status) {
+      switch (normalizeStatus(status)) {
+        case "sold":
+          return { fill: "#ffffff", stroke: "rgba(127, 29, 29, 0.92)" };
+        case "available":
+        case "in-talk":
+          return { fill: "#0f172a", stroke: "rgba(255, 255, 255, 0.92)" };
+        default:
+          return { fill: "#ffffff", stroke: "rgba(15, 23, 42, 0.78)" };
+      }
+    }
+
+    function renderSelectedPanel() {
+      const row = state.selectedId ? getRowById(state.selectedId) : null;
+      els.selectedDetails.innerHTML = "";
+
+      if (!row) {
+        els.selectedTitle.textContent = "Select a plot";
+        els.selectedBadge.textContent = "None";
+        els.selectedBadge.className = "rounded-lg bg-slate-100 px-3 py-2 text-xs font-black text-slate-600";
+        els.selectedDetails.innerHTML = '<p class="rounded-lg bg-slate-50 p-4 text-sm font-semibold text-slate-500">Click any colored plot on the layout, or type a plot number above.</p>';
+        return;
+      }
+
+      const status = stringifyValue(row[state.statusKey]) || "Pending";
+      els.selectedTitle.textContent = `Plot #${findRowId(row)}`;
+      els.selectedBadge.textContent = status;
+      els.selectedBadge.className = `rounded-lg px-3 py-2 text-xs font-black ${getStatusClasses(status)}`;
+
+      const important = [
+        ["Plot Type", row.plottype ?? row["Plot Type"]],
+        ["Dimensions", formatDimensions(row)],
+        ["Area", formatArea(row)],
+        ["Rate", formatMoney(row.ratepersqunit ?? row["Rate Per Sq.Unit"] ?? row.rate)],
+        ["Total", formatMoney(row.totalamount ?? row["Total Amount"] ?? row.amount)]
+      ];
+
+      important.forEach(([label, value]) => {
+        const item = document.createElement("div");
+        item.className = "rounded-lg bg-slate-50 p-3";
+        item.innerHTML = `<p class="text-xs font-black uppercase tracking-wide text-slate-500">${escapeHTML(label)}</p><p class="mt-1 break-words text-base font-black text-slate-900">${escapeHTML(value || "-")}</p>`;
+        els.selectedDetails.appendChild(item);
+      });
+
+      const statusWrap = document.createElement("div");
+      statusWrap.className = "rounded-lg border border-slate-200 p-3";
+      statusWrap.innerHTML = '<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Status</p>';
+      statusWrap.appendChild(renderStatusControl(row));
+      els.selectedDetails.appendChild(statusWrap);
+    }
+
+    function renderTable() {
+      els.tableHead.innerHTML = "";
+      els.tableBody.innerHTML = "";
+      const displayColumns = getDisplayColumns();
+
+      const headerRow = document.createElement("tr");
+      displayColumns.forEach(column => {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.className = "whitespace-nowrap px-4 py-3 text-left text-xs font-black uppercase tracking-wide text-slate-600";
+        th.textContent = prettifyColumn(column);
+        headerRow.appendChild(th);
+      });
+      els.tableHead.appendChild(headerRow);
+
+      state.filteredRows.forEach(row => {
+        const tr = document.createElement("tr");
+        const rowId = findRowId(row);
+        tr.className = `cursor-pointer transition hover:bg-emerald-50/70 ${state.selectedId === rowId ? "bg-amber-50" : ""}`;
+        tr.addEventListener("click", event => {
+          if (event.target.tagName !== "SELECT") selectPlot(rowId);
+        });
+
+        displayColumns.forEach(column => {
+          const td = document.createElement("td");
+          td.className = "px-4 py-3 align-middle text-sm font-semibold text-slate-700";
+          if (column === state.statusKey) {
+            td.appendChild(renderStatusControl(row));
+          } else {
+            const value = formatCell(row, column);
+            td.className += " whitespace-nowrap";
+            td.textContent = value || "-";
+            td.title = value;
+          }
+          tr.appendChild(td);
+        });
+        els.tableBody.appendChild(tr);
+      });
+    }
+
+    function renderCards() {
+      els.cardList.innerHTML = "";
+      state.filteredRows.forEach(row => {
+        const rowId = findRowId(row);
+        const card = document.createElement("article");
+        card.className = `rounded-xl border bg-white p-4 shadow-sm ${state.selectedId === rowId ? "border-gold ring-4 ring-gold/20" : "border-slate-200"}`;
+        card.addEventListener("click", event => {
+          if (event.target.tagName !== "SELECT") selectPlot(rowId);
+        });
+
+        card.innerHTML = `
+          <div class="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-black uppercase tracking-wide text-slate-500">${escapeHTML(stringifyValue(row.plottype ?? row["Plot Type"] ?? "Plot"))}</p>
+              <h3 class="mt-1 text-xl font-black text-slate-950">Plot #${escapeHTML(rowId)}</h3>
+            </div>
+            <span class="rounded-lg px-3 py-2 text-xs font-black ${getStatusClasses(row[state.statusKey])}">${escapeHTML(stringifyValue(row[state.statusKey]) || "Pending")}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-lg bg-slate-50 p-3"><p class="text-xs font-black uppercase text-slate-500">Dimensions</p><p class="mt-1 font-black">${escapeHTML(formatDimensions(row))}</p></div>
+            <div class="rounded-lg bg-slate-50 p-3"><p class="text-xs font-black uppercase text-slate-500">Area</p><p class="mt-1 font-black">${escapeHTML(formatArea(row))}</p></div>
+          </div>
+        `;
+
+        const statusWrap = document.createElement("div");
+        statusWrap.className = "mt-3";
+        statusWrap.appendChild(renderStatusControl(row));
+        card.appendChild(statusWrap);
+        els.cardList.appendChild(card);
+      });
+    }
+
+    function getDisplayColumns() {
+      const preferred = ["plotno", "plottype", "frontsize", "depthsize", "plotarea", "ratepersqunit", "totalamount", state.statusKey, "svgstatus"];
+      const picked = preferred.filter(column => state.columns.includes(column));
+      return [...picked, ...state.columns.filter(column => !picked.includes(column))].slice(0, 10);
+    }
+
+    function renderStatusControl(row) {
+      const currentStatus = stringifyValue(row[state.statusKey]) || "Pending";
+      const rowId = findRowId(row);
+
+      if (!state.isAdmin) {
+        const badge = document.createElement("span");
+        badge.className = `inline-flex min-h-10 items-center rounded-lg px-3 py-2 text-sm font-black ${getStatusClasses(currentStatus)}`;
+        badge.textContent = currentStatus;
+        return badge;
+      }
+
+      const wrap = document.createElement("div");
+      wrap.className = "flex min-w-[10rem] items-center gap-2";
+      const select = document.createElement("select");
+      select.className = "status-select min-h-12 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 py-3 pr-9 text-base font-black text-slate-900 outline-none transition focus:border-leaf focus:ring-4 focus:ring-emerald-100 disabled:cursor-wait disabled:opacity-70 lg:min-h-10 lg:py-2 lg:text-sm";
+      select.disabled = state.updatingIds.has(rowId);
+      select.setAttribute("aria-label", `Update status for plot ${rowId}`);
+
+      const options = currentStatus && !STATUS_OPTIONS.includes(currentStatus) ? [currentStatus, ...STATUS_OPTIONS] : STATUS_OPTIONS;
+      options.forEach(optionValue => {
+        const option = document.createElement("option");
+        option.value = optionValue;
+        option.textContent = optionValue;
+        option.selected = currentStatus === optionValue;
+        select.appendChild(option);
+      });
+      select.addEventListener("change", event => updateStatus(row, event.target.value, event.target));
+      wrap.appendChild(select);
+
+      if (state.updatingIds.has(rowId)) {
+        const spinner = document.createElement("span");
+        spinner.className = "loader !h-5 !w-5 !border-2";
+        spinner.setAttribute("aria-label", "Updating status");
+        wrap.appendChild(spinner);
+      }
+      return wrap;
+    }
+
+    async function updateStatus(row, newStatus, selectEl) {
+      const rowId = findRowId(row);
+      const previousStatus = stringifyValue(row[state.statusKey]);
+      if (newStatus === previousStatus) return;
+
+      state.updatingIds.add(rowId);
+      render();
+      const pendingToast = showToast("Updating status...", "loading", false);
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ rowId, id: rowId, status: newStatus, statusKey: state.statusKey, row })
+        });
+        if (!response.ok) throw new Error(`Update failed with status ${response.status}`);
+
+        row[state.statusKey] = newStatus;
+        dismissToast(pendingToast);
+        showToast("Status updated successfully!", "success");
+      } catch (error) {
+        row[state.statusKey] = previousStatus;
+        if (selectEl) selectEl.value = previousStatus;
+        dismissToast(pendingToast);
+        showToast("Error updating status", "error");
+        console.error(error);
+      } finally {
+        state.updatingIds.delete(rowId);
+        applyFilters();
+      }
+    }
+
+    function selectPlot(plotId) {
+      const normalized = String(plotId || "").trim();
+      const row = getRowById(normalized);
+      if (!row) {
+        showToast(`Plot #${normalized} was not found in the sheet`, "error");
+        return;
+      }
+      state.selectedId = normalized;
+      els.plotFinder.value = normalized;
+      render();
+      focusMapPlot(normalized);
+    }
+
+    function focusMapPlot(plotId) {
+      if (!state.mapReady || !state.mapDoc) return;
+      const shape = state.mapDoc.getElementById(`plot-${plotId}`);
+      if (!shape) return;
+      try {
+        const box = shape.getBBox();
+        const svg = state.mapDoc.getElementById("mapSvg");
+        const viewBox = svg.viewBox.baseVal;
+        const targetX = Math.max(0, box.x + box.width / 2 - 260);
+        const targetY = Math.max(0, box.y + box.height / 2 - 360);
+        svg.setAttribute("viewBox", `${targetX} ${targetY} ${Math.min(viewBox.width || 1136, 620)} ${Math.min(viewBox.height || 1600, 880)}`);
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+
+    function clearSelection() {
+      state.selectedId = "";
+      els.plotFinder.value = "";
+      state.query = "";
+      state.statusFilter = "";
+      els.searchInput.value = "";
+      els.statusFilter.value = "";
+      resetMapViewBox();
+      applyFilters();
+    }
+
+    function resetMapViewBox() {
+      const svg = state.mapDoc?.getElementById("mapSvg");
+      if (svg) svg.setAttribute("viewBox", "0 0 1136 1600");
+      setZoom(1);
+    }
+
+    function handlePlotFinder(event) {
+      const value = event.target.value.trim();
+      if (!value) {
+        state.selectedId = "";
+        render();
+        return;
+      }
+      const row = getRowById(value);
+      if (row) selectPlot(value);
+    }
+
+    function handleAdminToggle(event) {
+      state.isAdmin = event.target.checked;
+      if (event.target.checked) {
+        const password = window.prompt("Enter admin password");
+        if (password !== "7024") {
+          event.target.checked = false;
+          state.isAdmin = false;
+          els.modeLabel.textContent = "Locked";
+          showToast("Incorrect admin password", "error");
+          render();
+          return;
+        }
+      }
+      state.isAdmin = event.target.checked;
+      els.modeLabel.textContent = state.isAdmin ? "Unlocked" : "Locked";
+      render();
+    }
+
+    function setZoom(value) {
+      state.zoom = Math.max(0.72, Math.min(1.75, value));
+      els.mapObject.style.transform = `scale(${state.zoom})`;
+    }
+
+    function getRowById(id) {
+      return state.rows.find(row => findRowId(row) === String(id));
+    }
+
+    function formatCell(row, column) {
+      if (column === "plotarea") return formatArea(row);
+      if (column === "frontsize" || column === "depthsize") return `${stringifyValue(row[column])} ft`;
+      if (column === "ratepersqunit" || column === "totalamount") return formatMoney(row[column]);
+      return stringifyValue(row[column]);
+    }
+
+    function formatDimensions(row) {
+      const front = row.frontsize ?? row["Front Size"];
+      const depth = row.depthsize ?? row["Depth Size"];
+      if (!front && !depth) return "-";
+      return `${front || "-"} x ${depth || "-"} Ft`;
+    }
+
+    function formatArea(row) {
+      const area = row.plotarea ?? row["Plot Area"] ?? row.area;
+      return area ? `${Number(area).toLocaleString("en-IN", { maximumFractionDigits: 2 })} Sq.Ft` : "-";
+    }
+
+    function formatMoney(value) {
+      if (value === null || value === undefined || value === "") return "-";
+      const number = Number(value);
+      if (Number.isNaN(number)) return stringifyValue(value);
+      return number.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+    }
+
+    function normalizeStatus(status) {
+      return stringifyValue(status).trim().toLowerCase().replace(/\s+/g, "-");
+    }
+
+    function stringifyValue(value) {
+      if (value === null || value === undefined) return "";
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value);
+    }
+
+    function prettifyColumn(column) {
+      return String(column).replace(/[_-]+/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").trim();
+    }
+
+    function getStatusClasses(status) {
+      switch (normalizeStatus(status)) {
+        case "available": return "bg-sky-50 text-sky-700 ring-1 ring-sky-200";
+        case "in-talk": return "bg-amber-50 text-amber-800 ring-1 ring-amber-200";
+        case "sold": return "bg-rose-50 text-rose-700 ring-1 ring-rose-200";
+        case "in-progress": return "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200";
+        default: return "bg-slate-100 text-slate-700 ring-1 ring-slate-200";
+      }
+    }
+
+    function setLoading(isLoading) {
+      state.isLoading = isLoading;
+      if (isLoading && !state.mapReady) {
+        els.mapLoading.classList.remove("hidden", "opacity-0", "pointer-events-none");
+      } else if (!isLoading) {
+        hideMapLoader();
+      }
+      els.refreshBtn.disabled = isLoading;
+      els.refreshBtn.classList.toggle("opacity-60", isLoading);
+    }
+
+    function showError(message) {
+      els.errorMessage.textContent = `${message}. Confirm that the web app is deployed for public access and returns JSON.`;
+      els.errorState.classList.remove("hidden");
+    }
+
+    function hideError() {
+      els.errorState.classList.add("hidden");
+    }
+
+    function showToast(message, type = "info", autoDismiss = true) {
+      const toast = document.createElement("div");
+      const typeClasses = {
+        info: "border-slate-200 bg-white text-slate-900",
+        loading: "border-leaf bg-leaf text-white",
+        success: "border-emerald-200 bg-emerald-600 text-white",
+        error: "border-red-200 bg-red-600 text-white"
+      };
+      toast.className = `flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-black shadow-soft ${typeClasses[type] || typeClasses.info}`;
+      if (type === "loading") {
+        const spinner = document.createElement("span");
+        spinner.className = "mini-loader";
+        toast.appendChild(spinner);
+      }
+      const text = document.createElement("span");
+      text.textContent = message;
+      toast.appendChild(text);
+      els.toastRegion.appendChild(toast);
+      if (autoDismiss) window.setTimeout(() => dismissToast(toast), 3200);
+      return toast;
+    }
+
+    function dismissToast(toast) {
+      if (!toast || !toast.parentNode) return;
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(8px)";
+      toast.style.transition = "opacity 180ms ease, transform 180ms ease";
+      window.setTimeout(() => toast.remove(), 200);
+    }
+
+    function escapeHTML(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
