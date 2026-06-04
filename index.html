@@ -791,7 +791,7 @@
         ["Plot Type", row.plottype ?? row["Plot Type"]],
         ["Dimensions", formatDimensions(row)],
         ["Area", formatArea(row)],
-        ["Rate", formatMoney(row.ratepersqunit ?? row["Rate Per Sq.Unit"] ?? row.rate)],
+        ["Rate", formatMoney(row.ratepersqunit ?? row["Rate (per sq unit)"] ?? row.rate)],
         ["Total", formatMoney(row.totalamount ?? row["Total Amount"] ?? row.amount)]
       ];
     }
