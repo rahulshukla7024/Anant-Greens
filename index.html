@@ -362,6 +362,33 @@
 
   </main>
 
+  <div id="enquiryModal" class="fixed inset-0 z-50 hidden bg-slate-950/55 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+    <div class="mx-auto mt-10 max-h-[82vh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16">
+      <div class="mb-4">
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Quick Enquiry</p>
+        <h2 class="mt-1 text-2xl font-black text-slate-950">Interested in Plot #<span id="enquiryPlotNumber">-</span>?</h2>
+        <p class="mt-2 text-sm text-slate-600">Fill this quick form to view plot details and get in touch with our team.</p>
+      </div>
+      <form id="enquiryForm" class="grid gap-4">
+        <label class="block">
+          <span class="text-xs font-black uppercase tracking-wide text-slate-500">Full Name</span>
+          <input id="enquiryName" type="text" required placeholder="Your name" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+        </label>
+        <label class="block">
+          <span class="text-xs font-black uppercase tracking-wide text-slate-500">Address</span>
+          <textarea id="enquiryAddress" required placeholder="Your address" class="mt-2 min-h-24 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100"></textarea>
+        </label>
+        <label class="block">
+          <span class="text-xs font-black uppercase tracking-wide text-slate-500">Mobile Number</span>
+          <input id="enquiryMobile" type="tel" required placeholder="+91 98765 43210" pattern="[0-9+\s\-]+" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+        </label>
+        <div class="flex gap-3 pt-2">
+          <button id="submitEnquiryBtn" type="submit" class="w-full h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf">Submit & View</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="plotModal" class="fixed inset-0 z-50 hidden bg-slate-950/55 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="mx-auto mt-10 max-h-[82vh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16 md:max-w-xl">
       <div class="mb-4 flex items-start justify-between gap-3">
@@ -379,7 +406,7 @@
   <div id="toastRegion" class="fixed bottom-4 right-4 z-[60] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 sm:w-full" aria-live="polite" aria-atomic="true"></div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoKk00Np6htI2L8Gq9If_tqrjOyvSMlNY4ZCmIOxhrikyO9zdTdaM4VlFiJ0jPxCEyWA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9gej3uw5uLX5fNwKd-kkLL1lR0jTANmPN2Ti774YGge4rONqX5CTiq-2smEU5fr63wg/exec";
 
     const STATUS_OPTIONS = ["Available", "In Talk", "Sold"];
     const ID_KEYS = ["rowId", "rowID", "Row ID", "RowID", "id", "ID", "Id", "plotno", "Plot No", "plotId", "Plot ID", "serial", "Serial", "S.No", "S No"];
@@ -401,7 +428,9 @@
       mapReady: false,
       zoom: 1,
       pinchStartDistance: 0,
-      pinchStartZoom: 1
+      pinchStartZoom: 1,
+      enquirySubmittedThisSession: false,
+      interestedCountMap: {}
     };
 
     const els = {
@@ -422,6 +451,13 @@
       selectedTitle: document.getElementById("selectedTitle"),
       selectedBadge: document.getElementById("selectedBadge"),
       selectedDetails: document.getElementById("selectedDetails"),
+      enquiryModal: document.getElementById("enquiryModal"),
+      enquiryForm: document.getElementById("enquiryForm"),
+      enquiryPlotNumber: document.getElementById("enquiryPlotNumber"),
+      enquiryName: document.getElementById("enquiryName"),
+      enquiryAddress: document.getElementById("enquiryAddress"),
+      enquiryMobile: document.getElementById("enquiryMobile"),
+      submitEnquiryBtn: document.getElementById("submitEnquiryBtn"),
       plotModal: document.getElementById("plotModal"),
       modalCloseBtn: document.getElementById("modalCloseBtn"),
       modalTitle: document.getElementById("modalTitle"),
@@ -454,6 +490,10 @@
       els.zoomInBtn.addEventListener("click", () => setZoom(state.zoom + 0.12));
       els.zoomOutBtn.addEventListener("click", () => setZoom(state.zoom - 0.12));
       els.zoomResetBtn.addEventListener("click", () => setZoom(1));
+      els.enquiryForm.addEventListener("submit", handleEnquirySubmit);
+      els.enquiryModal.addEventListener("click", event => {
+        if (event.target === els.enquiryModal) closeEnquiryModal();
+      });
       els.modalCloseBtn.addEventListener("click", closePlotModal);
       els.plotModal.addEventListener("click", event => {
         if (event.target === els.plotModal) closePlotModal();
@@ -477,6 +517,12 @@
         state.columns = getColumns(state.rows);
         state.statusKey = findStatusKey(state.columns);
         populateStatusFilter();
+        
+        // Load interested count data
+        if (payload.interestedCounts && typeof payload.interestedCounts === 'object') {
+          state.interestedCountMap = payload.interestedCounts;
+        }
+        
         applyFilters();
       } catch (error) {
         state.rows = [];
@@ -828,7 +874,8 @@
 
     function openPlotModal(row) {
       const status = stringifyValue(row[state.statusKey]) || "Pending";
-      els.modalTitle.textContent = `Plot #${findRowId(row)}`;
+      const rowId = findRowId(row);
+      els.modalTitle.textContent = `Plot #${rowId}`;
       els.modalBadge.textContent = status;
       els.modalBadge.className = `mb-4 inline-flex rounded-lg px-3 py-2 text-xs font-black ${getStatusClasses(status)}`;
       els.modalDetails.innerHTML = "";
@@ -840,6 +887,38 @@
         els.modalDetails.appendChild(item);
       });
 
+      // Show interested people count for "In Talk" plots
+      if (normalizeStatus(status) === "in-talk") {
+        const interestedCount = state.interestedCountMap[rowId] || 0;
+        const interestedItem = document.createElement("div");
+        interestedItem.className = "rounded-lg bg-amber-50 p-3 border border-amber-100";
+        interestedItem.innerHTML = `<p class="text-xs font-black uppercase tracking-wide text-amber-600">Interested People</p><p class="mt-1 text-base font-black text-amber-900">${interestedCount} people</p>`;
+        els.modalDetails.appendChild(interestedItem);
+
+        // Show admin control for interested count
+        if (state.isAdmin) {
+          const adminItem = document.createElement("div");
+          adminItem.className = "rounded-lg border border-slate-200 p-3";
+          adminItem.innerHTML = '<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Update Interested Count</p>';
+          const controlDiv = document.createElement("div");
+          controlDiv.className = "flex items-center gap-2";
+          const input = document.createElement("input");
+          input.type = "number";
+          input.min = "0";
+          input.value = interestedCount;
+          input.className = "flex-1 h-11 rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100";
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf";
+          btn.textContent = "Save";
+          btn.addEventListener("click", () => updateInterestedCount(rowId, input.value));
+          controlDiv.appendChild(input);
+          controlDiv.appendChild(btn);
+          adminItem.appendChild(controlDiv);
+          els.modalDetails.appendChild(adminItem);
+        }
+      }
+
       const statusWrap = document.createElement("div");
       statusWrap.className = "rounded-lg border border-slate-200 p-3";
       statusWrap.innerHTML = '<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Status</p>';
@@ -847,6 +926,29 @@
       els.modalDetails.appendChild(statusWrap);
       els.plotModal.classList.remove("hidden");
       document.body.classList.add("overflow-hidden");
+    }
+
+    async function updateInterestedCount(plotId, count) {
+      const newCount = Math.max(0, parseInt(count, 10) || 0);
+      state.interestedCountMap[plotId] = newCount;
+
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "updateInterestedCount",
+            plotId: plotId,
+            interestedCount: newCount
+          })
+        });
+        showToast("Interested count updated successfully!", "success");
+        const row = getRowById(plotId);
+        if (row) openPlotModal(row);
+      } catch (error) {
+        console.error(error);
+        showToast("Error updating interested count", "error");
+      }
     }
 
     function closePlotModal() {
@@ -927,6 +1029,80 @@
       }
     }
 
+    function openEnquiryModal(plotId) {
+      els.enquiryPlotNumber.textContent = plotId;
+      els.enquiryForm.reset();
+      els.enquiryModal.classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
+      els.enquiryName.focus();
+    }
+
+    function closeEnquiryModal() {
+      els.enquiryModal.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    async function handleEnquirySubmit(event) {
+      event.preventDefault();
+      const plotId = els.enquiryPlotNumber.textContent;
+      const name = els.enquiryName.value.trim();
+      const address = els.enquiryAddress.value.trim();
+      const mobile = els.enquiryMobile.value.trim();
+
+      if (!name || !address || !mobile) {
+        showToast("Please fill all required fields", "error");
+        return;
+      }
+
+      const submitBtn = els.submitEnquiryBtn;
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="mini-loader !h-4 !w-4 !border-2"></span>';
+
+      try {
+        const payload = JSON.stringify({
+          type: "enquiry",
+          plotId: plotId,
+          name: name,
+          address: address,
+          mobile: mobile,
+          timestamp: new Date().toISOString()
+        });
+
+        console.log("Sending enquiry:", payload);
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: payload
+        });
+
+        console.log("Response status:", response.status);
+        const responseText = await response.text();
+        console.log("Response body:", responseText);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${responseText}`);
+        }
+
+        state.enquirySubmittedThisSession = true;
+        closeEnquiryModal();
+        showToast("Enquiry submitted successfully! 🎉", "success");
+        
+        // Show plot details after enquiry submission
+        const row = getRowById(plotId);
+        if (row) {
+          setTimeout(() => openPlotModal(row), 500);
+        }
+      } catch (error) {
+        console.error("Enquiry submission error:", error);
+        showToast(`Error: ${error.message}`, "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    }
+
     function selectPlot(plotId) {
       const normalized = String(plotId || "").trim();
       const row = getRowById(normalized);
@@ -938,7 +1114,13 @@
       if (els.plotFinder) els.plotFinder.value = normalized;
       render();
       centerMapPlot(normalized);
-      openPlotModal(row);
+      
+      // Show enquiry form if user is not admin and hasn't submitted enquiry this session
+      if (!state.isAdmin && !state.enquirySubmittedThisSession) {
+        openEnquiryModal(normalized);
+      } else {
+        openPlotModal(row);
+      }
     }
 
     function centerMapPlot(plotId) {
