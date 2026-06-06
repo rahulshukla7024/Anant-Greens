@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
   <meta name="theme-color" content="#052e1a">
   <title>Anant Greens Plot Inventory</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +32,24 @@
         radial-gradient(circle at 9% 3%, rgba(212, 175, 55, 0.18), transparent 23rem),
         radial-gradient(circle at 88% 18%, rgba(34, 197, 94, 0.13), transparent 24rem),
         linear-gradient(180deg, #f7faf7 0%, #edf3ef 100%);
+      /* iOS Safe Area Padding for Notch/Home Bar */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      -webkit-font-smoothing: antialiased;
     }
+    
+    /* iOS Fix: Remove gray tap highlights */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* iOS Fix: Force 16px to prevent auto-zoom on focus, and remove native styling */
+    input, textarea, select {
+      -webkit-appearance: none;
+      font-size: 16px !important; 
+    }
+
     .loader, .mini-loader {
       border-radius: 9999px;
       animation: spin 0.8s linear infinite;
@@ -64,6 +81,8 @@
         linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
         linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
       background-size: 32px 32px;
+      /* iOS Fix: Smooth scrolling for nested elements */
+      -webkit-overflow-scrolling: touch; 
     }
     #mapObject {
       align-items: flex-start;
@@ -91,7 +110,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen overflow-x-hidden text-slate-900 antialiased">
+<body class="min-h-[100dvh] overflow-x-hidden text-slate-900 antialiased">
   <header class="relative z-40 border-b border-gold/40 bg-forest text-white shadow-lg lg:sticky lg:top-0">
     <div class="mx-auto max-w-[1500px] px-4 py-4 sm:px-6 lg:px-8">
       <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -170,7 +189,7 @@
           <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-rose-500"></span>Sold</span>
         </div>
 
-        <div id="mapStage" class="map-stage relative h-[64vh] min-h-[520px] overflow-auto rounded-lg border border-slate-200 p-4 sm:h-[72vh]">
+        <div id="mapStage" class="map-stage relative h-[64dvh] min-h-[520px] overflow-auto rounded-lg border border-slate-200 p-4 sm:h-[72dvh]">
           <div id="mapLoading" class="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] transition-opacity duration-300">
             <div class="flex flex-col items-center gap-4 text-center text-white">
               <div class="loader"></div>
@@ -310,13 +329,13 @@
           <div class="grid gap-4 sm:grid-cols-2">
             <label class="block">
               <span class="text-xs font-black uppercase tracking-wide text-slate-500">Availability</span>
-              <select id="statusFilter" class="mt-2 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+              <select id="statusFilter" class="mt-2 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
                 <option value="">All Assets</option>
               </select>
             </label>
             <label class="block">
               <span class="text-xs font-black uppercase tracking-wide text-slate-500">Find Plot #</span>
-              <input id="plotFinder" inputmode="numeric" placeholder="77" class="mt-2 h-12 w-full rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+              <input id="plotFinder" inputmode="numeric" placeholder="77" class="mt-2 h-12 w-full rounded-lg border border-slate-300 px-3 text-base font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
             </label>
           </div>
           <div class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -363,7 +382,7 @@
   </main>
 
   <div id="enquiryModal" class="fixed inset-0 z-50 hidden bg-slate-950/55 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
-    <div class="mx-auto mt-10 max-h-[82vh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16">
+    <div class="mx-auto mt-10 max-h-[82dvh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16">
       <div class="mb-4">
         <p class="text-xs font-black uppercase tracking-wide text-slate-500">Quick Enquiry</p>
         <h2 class="mt-1 text-2xl font-black text-slate-950">Interested in Plot #<span id="enquiryPlotNumber">-</span>?</h2>
@@ -372,15 +391,15 @@
       <form id="enquiryForm" class="grid gap-4">
         <label class="block">
           <span class="text-xs font-black uppercase tracking-wide text-slate-500">Full Name</span>
-          <input id="enquiryName" type="text" required placeholder="Your name" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+          <input id="enquiryName" type="text" required placeholder="Your name" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-base font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
         </label>
         <label class="block">
           <span class="text-xs font-black uppercase tracking-wide text-slate-500">Address</span>
-          <textarea id="enquiryAddress" required placeholder="Your address" class="mt-2 min-h-24 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100"></textarea>
+          <textarea id="enquiryAddress" required placeholder="Your address" class="mt-2 min-h-24 w-full rounded-lg border border-slate-300 px-3 py-2 text-base font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100"></textarea>
         </label>
         <label class="block">
           <span class="text-xs font-black uppercase tracking-wide text-slate-500">Mobile Number</span>
-          <input id="enquiryMobile" type="tel" required placeholder="+91 98765 43210" pattern="[0-9+\s\-]+" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+          <input id="enquiryMobile" type="tel" required placeholder="+91 98765 43210" pattern="[0-9+\s\-]+" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-base font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
         </label>
         <div class="flex gap-3 pt-2">
           <button id="submitEnquiryBtn" type="submit" class="w-full h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf">Submit & View</button>
@@ -390,7 +409,7 @@
   </div>
 
   <div id="plotModal" class="fixed inset-0 z-50 hidden bg-slate-950/55 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="mx-auto mt-10 max-h-[82vh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16 md:max-w-xl">
+    <div class="mx-auto mt-10 max-h-[82dvh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16 md:max-w-xl">
       <div class="mb-4 flex items-start justify-between gap-3">
         <div>
           <p class="text-xs font-black uppercase tracking-wide text-slate-500">Selected Plot</p>
@@ -887,7 +906,6 @@
         els.modalDetails.appendChild(item);
       });
 
-      // Show interested people count for "In Talk" plots
       if (normalizeStatus(status) === "in-talk") {
         const interestedCount = state.interestedCountMap[rowId] || 0;
         const interestedItem = document.createElement("div");
@@ -895,7 +913,6 @@
         interestedItem.innerHTML = `<p class="text-xs font-black uppercase tracking-wide text-amber-600">Interested People</p><p class="mt-1 text-base font-black text-amber-900">${interestedCount} people</p>`;
         els.modalDetails.appendChild(interestedItem);
 
-        // Show admin control for interested count
         if (state.isAdmin) {
           const adminItem = document.createElement("div");
           adminItem.className = "rounded-lg border border-slate-200 p-3";
@@ -906,7 +923,8 @@
           input.type = "number";
           input.min = "0";
           input.value = interestedCount;
-          input.className = "flex-1 h-11 rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100";
+          /* iOS Fix: Using text-base here to prevent native zoom */
+          input.className = "flex-1 h-11 rounded-lg border border-slate-300 px-3 text-base font-bold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100";
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf";
@@ -970,6 +988,7 @@
       const wrap = document.createElement("div");
       wrap.className = "flex min-w-[10rem] items-center gap-2";
       const select = document.createElement("select");
+      /* iOS Fix: Ensure text-base on mobile selects */
       select.className = "status-select min-h-12 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 py-3 pr-9 text-base font-black text-slate-900 outline-none transition focus:border-leaf focus:ring-4 focus:ring-emerald-100 disabled:cursor-wait disabled:opacity-70 lg:min-h-10 lg:py-2 lg:text-sm";
       select.disabled = state.updatingIds.has(rowId);
       select.setAttribute("aria-label", `Update status for plot ${rowId}`);
@@ -1089,7 +1108,6 @@
         closeEnquiryModal();
         showToast("Enquiry submitted successfully! 🎉", "success");
         
-        // Show plot details after enquiry submission
         const row = getRowById(plotId);
         if (row) {
           setTimeout(() => openPlotModal(row), 500);
@@ -1115,7 +1133,6 @@
       render();
       centerMapPlot(normalized);
       
-      // Show enquiry form if user is not admin and hasn't submitted enquiry this session
       if (!state.isAdmin && !state.enquirySubmittedThisSession) {
         openEnquiryModal(normalized);
       } else {
