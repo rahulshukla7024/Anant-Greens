@@ -1,10 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#052e1a">
   <title>Anant Greens Plot Inventory</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L5Y60BVE22"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag("js", new Date());
+    gtag("config", "G-XXXXXXXXXX");
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -32,24 +39,13 @@
         radial-gradient(circle at 9% 3%, rgba(212, 175, 55, 0.18), transparent 23rem),
         radial-gradient(circle at 88% 18%, rgba(34, 197, 94, 0.13), transparent 24rem),
         linear-gradient(180deg, #f7faf7 0%, #edf3ef 100%);
-      /* iOS Safe Area Padding for Notch/Home Bar */
       padding-left: env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
       padding-bottom: env(safe-area-inset-bottom);
       -webkit-font-smoothing: antialiased;
     }
-    
-    /* iOS Fix: Remove gray tap highlights */
-    * {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* iOS Fix: Force 16px to prevent auto-zoom on focus, and remove native styling */
-    input, textarea, select {
-      -webkit-appearance: none;
-      font-size: 16px !important; 
-    }
-
+    * { -webkit-tap-highlight-color: transparent; }
+    input, textarea, select { font-size: 16px; }
     .loader, .mini-loader {
       border-radius: 9999px;
       animation: spin 0.8s linear infinite;
@@ -81,8 +77,7 @@
         linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
         linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
       background-size: 32px 32px;
-      /* iOS Fix: Smooth scrolling for nested elements */
-      -webkit-overflow-scrolling: touch; 
+      -webkit-overflow-scrolling: touch;
     }
     #mapObject {
       align-items: flex-start;
@@ -110,32 +105,34 @@
     }
   </style>
 </head>
-<body class="min-h-[100dvh] overflow-x-hidden text-slate-900 antialiased">
+<body class="min-h-screen overflow-x-hidden text-slate-900 antialiased">
   <header class="relative z-40 border-b border-gold/40 bg-forest text-white shadow-lg lg:sticky lg:top-0">
     <div class="mx-auto max-w-[1500px] px-4 py-4 sm:px-6 lg:px-8">
       <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div class="min-w-0">
           <div class="flex flex-wrap items-end gap-x-3 gap-y-1">
             <h1 class="text-2xl font-black tracking-tight sm:text-3xl">Anant <span class="text-gold">Greens</span></h1>
-            <span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-emerald-50">Plot Map Inventory</span>
+            <span class="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-emerald-50" data-i18n="plotMapInventory">Plot Map Inventory</span>
           </div>
-          <p class="mt-1 text-sm font-medium text-emerald-100/85">Premium smart township development • Shri Anant Creation</p>
+          <p class="mt-1 text-sm font-medium text-emerald-100/85" data-i18n="tagline">Premium smart township development • Shri Anant Creation</p>
         </div>
 
-        <div class="grid gap-3 sm:grid-cols-[1fr_auto] xl:w-[780px]">
+        <div class="grid gap-3 sm:grid-cols-[1fr_auto_auto] xl:w-[900px]">
           <label class="relative block" for="searchInput">
             <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
               <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.3-4.3m1.3-5.7a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"></path>
               </svg>
             </span>
-            <input id="searchInput" type="search" autocomplete="off" placeholder="Search plot, type, size, status..."
+            <input id="searchInput" type="search" autocomplete="off" placeholder="Search plot, type, size, status..." data-i18n-placeholder="searchPlaceholder"
               class="h-12 w-full rounded-lg border border-white/15 bg-white py-3 pl-10 pr-4 text-base font-semibold text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-gold focus:ring-4 focus:ring-gold/20">
           </label>
 
+          <button id="languageToggle" type="button" class="h-12 rounded-lg border border-white/15 bg-white/10 px-4 text-sm font-black text-white transition hover:bg-white/15" aria-label="Switch language">English</button>
+
           <div class="flex items-center justify-between gap-3 rounded-lg border border-white/15 bg-white/10 p-2">
             <div class="whitespace-nowrap text-right">
-              <p class="text-[11px] font-bold uppercase tracking-wide text-emerald-100/70">Admin Lock</p>
+              <p class="text-[11px] font-bold uppercase tracking-wide text-emerald-100/70" data-i18n="adminLock">Admin Lock</p>
               <p id="modeLabel" class="text-sm font-black text-white">Locked</p>
             </div>
             <label class="relative inline-flex cursor-pointer items-center" for="adminToggle">
@@ -152,19 +149,19 @@
   <main class="mx-auto flex max-w-[1500px] flex-col px-4 py-6 sm:px-6 lg:px-8">
     <section class="order-3 mb-5 grid gap-3 sm:grid-cols-2 xl:order-1 xl:hidden xl:grid-cols-4">
       <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Total Plots</p>
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="totalPlots">Total Plots</p>
         <p id="totalCount" class="mt-1 text-3xl font-black text-slate-950">0</p>
       </div>
       <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Sold</p>
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="sold">Sold</p>
         <p id="soldCount" class="mt-1 text-3xl font-black text-rose-700">0</p>
       </div>
       <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Available</p>
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="available">Available</p>
         <p id="availableCount" class="mt-1 text-3xl font-black text-sky-700">0</p>
       </div>
       <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-black uppercase tracking-wide text-slate-500">In Talk</p>
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="inTalk">In Talk</p>
         <p id="inTalkCount" class="mt-1 text-3xl font-black text-amber-700">0</p>
       </div>
     </section>
@@ -173,27 +170,27 @@
       <section class="map-shell order-2 rounded-xl p-3 shadow-soft sm:p-4 xl:order-1">
         <div class="mb-3 flex flex-col gap-3 text-slate-950 lg:flex-row lg:items-center lg:justify-between">
           <div id="interactive-layout">
-            <p class="text-xs font-black uppercase tracking-[0.2em] text-gold">Interactive Layout</p>
-            <h2 class="mt-1 text-xl font-black">Live Plot Availability Map</h2>
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-gold" data-i18n="interactiveLayout">Interactive Layout</p>
+            <h2 class="mt-1 text-xl font-black" data-i18n="liveMap">Live Plot Availability Map</h2>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button id="zoomOutBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-black transition hover:bg-slate-100" aria-label="Zoom out">-</button>
-            <button id="zoomResetBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-black transition hover:bg-slate-100">Reset</button>
+            <button id="zoomResetBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-black transition hover:bg-slate-100" data-i18n="reset">Reset</button>
             <button id="zoomInBtn" type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-black transition hover:bg-slate-100" aria-label="Zoom in">+</button>
           </div>
         </div>
 
         <div class="mb-3 flex w-full items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 text-xs font-bold text-slate-700">
-          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-sky-500"></span>Available</span>
-          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-amber-400"></span>In Talk</span>
-          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-rose-500"></span>Sold</span>
+          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-sky-500"></span><span data-i18n="available">Available</span></span>
+          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-amber-400"></span><span data-i18n="inTalk">In Talk</span></span>
+          <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 ring-1 ring-slate-200 px-3 py-1.5"><span class="h-3 w-3 rounded-full bg-rose-500"></span><span data-i18n="sold">Sold</span></span>
         </div>
 
-        <div id="mapStage" class="map-stage relative h-[64dvh] min-h-[520px] overflow-auto rounded-lg border border-slate-200 p-4 sm:h-[72dvh]">
+        <div id="mapStage" class="map-stage relative h-[64vh] min-h-[520px] overflow-auto rounded-lg border border-slate-200 p-4 sm:h-[72vh]">
           <div id="mapLoading" class="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] transition-opacity duration-300">
             <div class="flex flex-col items-center gap-4 text-center text-white">
               <div class="loader"></div>
-              <p class="text-sm font-bold">Loading plot map and sheet data</p>
+              <p class="text-sm font-bold" data-i18n="loadingMap">Loading plot map and sheet data</p>
             </div>
           </div>
           <div id="mapObject" class="mx-auto flex h-full w-full items-center justify-center rounded-md">
@@ -314,7 +311,6 @@
 <path id="plot-3" d="M487.078 1191.06V1131.06H454.078V1191.06H487.078Z" stroke="white"/>
 <path id="plot-2" d="M454.078 1191.06V1131.06H420.078V1191.06H454.078Z" stroke="white"/>
 <path id="plot-1" d="M419.078 1191.06H368.078L397.078 1131.06H419.078V1191.06Z" stroke="white"/>
-<rect id="map-background 1" width="1500" height="1364" fill="url(#pattern0_1_170)"/>
 </g>
 </svg>
 
@@ -328,43 +324,43 @@
         <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft xl:hidden">
           <div class="grid gap-4 sm:grid-cols-2">
             <label class="block">
-              <span class="text-xs font-black uppercase tracking-wide text-slate-500">Availability</span>
-              <select id="statusFilter" class="mt-2 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
-                <option value="">All Assets</option>
+              <span class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="availability">Availability</span>
+              <select id="statusFilter" class="mt-2 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+                <option value="" data-i18n="allAssets">All Assets</option>
               </select>
             </label>
             <label class="block">
-              <span class="text-xs font-black uppercase tracking-wide text-slate-500">Find Plot #</span>
-              <input id="plotFinder" inputmode="numeric" placeholder="77" class="mt-2 h-12 w-full rounded-lg border border-slate-300 px-3 text-base font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+              <span class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="findPlot">Find Plot #</span>
+              <input id="plotFinder" inputmode="numeric" placeholder="77" class="mt-2 h-12 w-full rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-800 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
             </label>
           </div>
           <div class="mt-4 grid gap-3 sm:grid-cols-2">
-            <button id="clearBtn" type="button" class="h-11 rounded-lg border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-700 transition hover:bg-slate-200">Clear Selection</button>
-            <button id="refreshBtn" type="button" class="h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf">Refresh Sheet</button>
+            <button id="clearBtn" type="button" class="h-11 rounded-lg border border-slate-300 bg-slate-100 px-4 text-sm font-black text-slate-700 transition hover:bg-slate-200" data-i18n="clearSelection">Clear Selection</button>
+            <button id="refreshBtn" type="button" class="h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf" data-i18n="refreshSheet">Refresh Sheet</button>
           </div>
         </section>
 
         <section class="hidden rounded-xl border border-slate-200 bg-white p-4 shadow-soft xl:block">
-          <p class="text-xs font-black uppercase tracking-wide text-slate-500">Total Plots</p>
+          <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="totalPlots">Total Plots</p>
           <p id="desktopTotalCount" class="mt-1 text-3xl font-black text-slate-950">0</p>
         </section>
         <section class="hidden rounded-xl border border-slate-200 bg-white p-4 shadow-soft xl:block">
-          <p class="text-xs font-black uppercase tracking-wide text-slate-500">Available</p>
+          <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="available">Available</p>
           <p id="desktopAvailableCount" class="mt-1 text-3xl font-black text-sky-700">0</p>
         </section>
         <section class="hidden rounded-xl border border-slate-200 bg-white p-4 shadow-soft xl:block">
-          <p class="text-xs font-black uppercase tracking-wide text-slate-500">Sold</p>
+          <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="sold">Sold</p>
           <p id="desktopSoldCount" class="mt-1 text-3xl font-black text-rose-700">0</p>
         </section>
         <section class="hidden rounded-xl border border-slate-200 bg-white p-4 shadow-soft xl:block">
-          <p class="text-xs font-black uppercase tracking-wide text-slate-500">In Talk</p>
+          <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="inTalk">In Talk</p>
           <p id="desktopInTalkCount" class="mt-1 text-3xl font-black text-amber-700">0</p>
         </section>
 
         <section id="selectedPanel" class="hidden rounded-xl border border-slate-200 bg-white p-5 shadow-soft md:block xl:hidden">
           <div class="flex items-start justify-between gap-3">
             <div>
-              <p class="text-xs font-black uppercase tracking-wide text-slate-500">Selected Plot</p>
+              <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="selectedPlot">Selected Plot</p>
               <h2 id="selectedTitle" class="mt-1 text-2xl font-black text-slate-950">Select a plot</h2>
             </div>
             <span id="selectedBadge" class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-black text-slate-600">None</span>
@@ -373,46 +369,55 @@
         </section>
 
         <section id="errorState" class="hidden rounded-xl border border-red-200 bg-red-50 p-5 shadow-sm">
-          <p class="font-black text-red-900">Unable to load database</p>
-          <p id="errorMessage" class="mt-1 text-sm font-medium text-red-700">Please check the deployment URL.</p>
+          <p class="font-black text-red-900" data-i18n="unableLoad">Unable to load database</p>
+          <p id="errorMessage" class="mt-1 text-sm font-medium text-red-700" data-i18n="checkUrl">Please check the deployment URL.</p>
         </section>
       </aside>
     </section>
 
   </main>
 
+  <div id="introModal" class="fixed inset-0 z-[70] hidden bg-slate-950/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+    <div class="mx-auto mt-24 max-w-sm rounded-xl bg-white p-6 text-center shadow-2xl">
+      <p id="introTitle" class="text-xs font-black uppercase tracking-[0.2em] text-gold" data-i18n="welcome">Welcome</p>
+      <h2 class="mt-2 text-2xl font-black text-slate-950" data-i18n="introTitle">Click the plot for its details</h2>
+      <p class="mt-2 text-sm font-semibold text-slate-600" data-i18n="introHelp">Tap any plot on the map to view its details.</p>
+      <button id="introOkBtn" type="button" class="mt-5 h-11 w-full rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf" data-i18n="ok">OK</button>
+    </div>
+  </div>
+
   <div id="enquiryModal" class="fixed inset-0 z-50 hidden bg-slate-950/55 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
-    <div class="mx-auto mt-10 max-h-[82dvh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16">
+    <div class="mx-auto mt-10 max-h-[82vh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16">
       <div class="mb-4">
-        <p class="text-xs font-black uppercase tracking-wide text-slate-500">Quick Enquiry</p>
+        <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="quickEnquiry">Quick Enquiry</p>
         <h2 class="mt-1 text-2xl font-black text-slate-950">Interested in Plot #<span id="enquiryPlotNumber">-</span>?</h2>
-        <p class="mt-2 text-sm text-slate-600">Fill this quick form to view plot details and get in touch with our team.</p>
+        <p class="mt-2 text-sm text-slate-600" data-i18n="enquiryHelp">Fill this quick form to view plot details and get in touch with our team.</p>
       </div>
       <form id="enquiryForm" class="grid gap-4">
         <label class="block">
-          <span class="text-xs font-black uppercase tracking-wide text-slate-500">Full Name</span>
-          <input id="enquiryName" type="text" required placeholder="Your name" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-base font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+          <span class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="fullName">Full Name</span>
+          <input id="enquiryName" type="text" required placeholder="Your name" data-i18n-placeholder="namePlaceholder" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
         </label>
         <label class="block">
-          <span class="text-xs font-black uppercase tracking-wide text-slate-500">Address</span>
-          <textarea id="enquiryAddress" required placeholder="Your address" class="mt-2 min-h-24 w-full rounded-lg border border-slate-300 px-3 py-2 text-base font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100"></textarea>
+          <span class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="address">Address</span>
+          <textarea id="enquiryAddress" required placeholder="Your address" data-i18n-placeholder="addressPlaceholder" class="mt-2 min-h-24 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100"></textarea>
         </label>
         <label class="block">
-          <span class="text-xs font-black uppercase tracking-wide text-slate-500">Mobile Number</span>
-          <input id="enquiryMobile" type="tel" required placeholder="+91 98765 43210" pattern="[0-9+\s\-]+" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-base font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
+          <span class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="mobileNumber">Mobile Number</span>
+          <input id="enquiryMobile" type="tel" required placeholder="+91 98765 43210" pattern="[0-9+\s\-]+" class="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100">
         </label>
         <div class="flex gap-3 pt-2">
-          <button id="submitEnquiryBtn" type="submit" class="w-full h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf">Submit & View</button>
+          <button id="submitEnquiryBtn" type="submit" class="w-full h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf" data-i18n="submitView">Submit & View</button>
         </div>
       </form>
     </div>
   </div>
 
   <div id="plotModal" class="fixed inset-0 z-50 hidden bg-slate-950/55 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="mx-auto mt-10 max-h-[82dvh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16 md:max-w-xl">
+    <div class="mx-auto mt-10 max-h-[82vh] max-w-md overflow-y-auto rounded-xl bg-white p-5 shadow-2xl md:mt-16 md:max-w-xl">
       <div class="mb-4 flex items-start justify-between gap-3">
         <div>
-          <p class="text-xs font-black uppercase tracking-wide text-slate-500">Selected Plot</p>
+          <p class="text-xs font-black uppercase tracking-wide text-slate-500" data-i18n="selectedPlot">Selected Plot</p>
           <h2 id="modalTitle" class="mt-1 text-2xl font-black text-slate-950">Plot Details</h2>
         </div>
         <button id="modalCloseBtn" type="button" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xl font-black text-slate-700" aria-label="Close plot details">×</button>
@@ -431,6 +436,142 @@
     const ID_KEYS = ["rowId", "rowID", "Row ID", "RowID", "id", "ID", "Id", "plotno", "Plot No", "plotId", "Plot ID", "serial", "Serial", "S.No", "S No"];
     const STATUS_KEYS = ["status", "Status", "STATUS", "currentStatus", "Current Status"];
     const SVG_NS = "http://www.w3.org/2000/svg";
+    const I18N = {
+      hi: {
+        languageButton: "English",
+        plotMapInventory: "प्लॉट मैप इन्वेंटरी",
+        tagline: "प्रीमियम स्मार्ट टाउनशिप डेवलपमेंट • श्री अनंत क्रिएशन",
+        searchPlaceholder: "प्लॉट, प्रकार, साइज, स्टेटस खोजें...",
+        adminLock: "एडमिन लॉक",
+        locked: "लॉक",
+        unlocked: "अनलॉक",
+        totalPlots: "कुल प्लॉट",
+        sold: "बिक गया",
+        available: "उपलब्ध",
+        inTalk: "बातचीत में",
+        interactiveLayout: "इंटरैक्टिव लेआउट",
+        liveMap: "लाइव प्लॉट उपलब्धता मैप",
+        reset: "रीसेट",
+        loadingMap: "प्लॉट मैप और शीट डेटा लोड हो रहा है",
+        availability: "उपलब्धता",
+        allAssets: "सभी प्लॉट",
+        findPlot: "प्लॉट # खोजें",
+        clearSelection: "चयन हटाएं",
+        refreshSheet: "शीट रिफ्रेश करें",
+        selectedPlot: "चुना गया प्लॉट",
+        selectPlot: "प्लॉट चुनें",
+        none: "कोई नहीं",
+        unableLoad: "डेटाबेस लोड नहीं हुआ",
+        checkUrl: "कृपया डिप्लॉयमेंट URL जांचें।",
+        quickEnquiry: "त्वरित पूछताछ",
+        interestedPlot: "प्लॉट #{plot} में रुचि है?",
+        enquiryHelp: "प्लॉट विवरण देखने और हमारी टीम से संपर्क के लिए यह छोटा फॉर्म भरें।",
+        fullName: "पूरा नाम",
+        namePlaceholder: "आपका नाम",
+        address: "पता",
+        addressPlaceholder: "आपका पता",
+        mobileNumber: "मोबाइल नंबर",
+        submitView: "सबमिट करें और देखें",
+        plotDetails: "प्लॉट विवरण",
+        welcome: "स्वागत है",
+        introTitle: "प्लॉट की जानकारी के लिए प्लॉट पर क्लिक करें",
+        introHelp: "मैप पर किसी भी प्लॉट पर टैप करके उसकी जानकारी देखें।",
+        ok: "ठीक है",
+        status: "स्टेटस",
+        pending: "पेंडिंग",
+        inProgress: "प्रगति में",
+        completed: "पूरा हुआ",
+        approved: "स्वीकृत",
+        plotType: "प्लॉट प्रकार",
+        dimensions: "साइज",
+        area: "एरिया",
+        rate: "रेट",
+        total: "कुल",
+        interestedPeople: "रुचि रखने वाले लोग",
+        people: "लोग",
+        updateInterestedCount: "रुचि संख्या अपडेट करें",
+        save: "सेव",
+        updatingStatus: "स्टेटस अपडेट हो रहा है...",
+        statusUpdated: "स्टेटस अपडेट हो गया!",
+        statusError: "स्टेटस अपडेट नहीं हुआ",
+        interestedUpdated: "रुचि संख्या अपडेट हो गई!",
+        interestedError: "रुचि संख्या अपडेट नहीं हुई",
+        requiredFields: "कृपया सभी जरूरी जानकारी भरें",
+        enquirySuccess: "पूछताछ सफलतापूर्वक भेजी गई!",
+        plotNotFound: "प्लॉट #{plot} शीट में नहीं मिला",
+        adminPassword: "एडमिन पासवर्ड डालें",
+        incorrectPassword: "एडमिन पासवर्ड गलत है",
+        closePlotDetails: "प्लॉट विवरण बंद करें",
+        loadErrorSuffix: "कृपया पुष्टि करें कि वेब ऐप public access के लिए deployed है और JSON return कर रहा है।"
+      },
+      en: {
+        languageButton: "हिन्दी",
+        plotMapInventory: "Plot Map Inventory",
+        tagline: "Premium smart township development • Shri Anant Creation",
+        searchPlaceholder: "Search plot, type, size, status...",
+        adminLock: "Admin Lock",
+        locked: "Locked",
+        unlocked: "Unlocked",
+        totalPlots: "Total Plots",
+        sold: "Sold",
+        available: "Available",
+        inTalk: "In Talk",
+        interactiveLayout: "Interactive Layout",
+        liveMap: "Live Plot Availability Map",
+        reset: "Reset",
+        loadingMap: "Loading plot map and sheet data",
+        availability: "Availability",
+        allAssets: "All Assets",
+        findPlot: "Find Plot #",
+        clearSelection: "Clear Selection",
+        refreshSheet: "Refresh Sheet",
+        selectedPlot: "Selected Plot",
+        selectPlot: "Select a plot",
+        none: "None",
+        unableLoad: "Unable to load database",
+        checkUrl: "Please check the deployment URL.",
+        quickEnquiry: "Quick Enquiry",
+        interestedPlot: "Interested in Plot #{plot}?",
+        enquiryHelp: "Fill this quick form to view plot details and get in touch with our team.",
+        fullName: "Full Name",
+        namePlaceholder: "Your name",
+        address: "Address",
+        addressPlaceholder: "Your address",
+        mobileNumber: "Mobile Number",
+        submitView: "Submit & View",
+        plotDetails: "Plot Details",
+        welcome: "Welcome",
+        introTitle: "Click the plot for its details",
+        introHelp: "Tap any plot on the map to view its details.",
+        ok: "OK",
+        status: "Status",
+        pending: "Pending",
+        inProgress: "In Progress",
+        completed: "Completed",
+        approved: "Approved",
+        plotType: "Plot Type",
+        dimensions: "Dimensions",
+        area: "Area",
+        rate: "Rate",
+        total: "Total",
+        interestedPeople: "Interested People",
+        people: "people",
+        updateInterestedCount: "Update Interested Count",
+        save: "Save",
+        updatingStatus: "Updating status...",
+        statusUpdated: "Status updated successfully!",
+        statusError: "Error updating status",
+        interestedUpdated: "Interested count updated successfully!",
+        interestedError: "Error updating interested count",
+        requiredFields: "Please fill all required fields",
+        enquirySuccess: "Enquiry submitted successfully!",
+        plotNotFound: "Plot #{plot} was not found in the sheet",
+        adminPassword: "Enter admin password",
+        incorrectPassword: "Incorrect admin password",
+        closePlotDetails: "Close plot details",
+        loadErrorSuffix: "Confirm that the web app is deployed for public access and returns JSON."
+      }
+    };
 
     const state = {
       rows: [],
@@ -438,6 +579,7 @@
       columns: [],
       query: "",
       statusFilter: "",
+      lang: "hi",
       isAdmin: false,
       isLoading: false,
       selectedId: "",
@@ -490,11 +632,18 @@
       desktopTotalCount: document.getElementById("desktopTotalCount"),
       desktopSoldCount: document.getElementById("desktopSoldCount"),
       desktopAvailableCount: document.getElementById("desktopAvailableCount"),
-      desktopInTalkCount: document.getElementById("desktopInTalkCount")
+      desktopInTalkCount: document.getElementById("desktopInTalkCount"),
+      languageToggle: document.getElementById("languageToggle"),
+      introModal: document.getElementById("introModal"),
+      introOkBtn: document.getElementById("introOkBtn")
     };
 
     document.addEventListener("DOMContentLoaded", () => {
+      applyTranslations();
+      openIntroModal();
       els.adminToggle.addEventListener("change", handleAdminToggle);
+      els.languageToggle.addEventListener("click", toggleLanguage);
+      els.introOkBtn.addEventListener("click", closeIntroModal);
       els.searchInput.addEventListener("input", event => {
         state.query = event.target.value.trim().toLowerCase();
         applyFilters();
@@ -521,6 +670,66 @@
       initializeMap();
       fetchRows();
     });
+
+    function t(key, params = {}) {
+      const template = I18N[state.lang]?.[key] ?? I18N.en[key] ?? key;
+      return Object.entries(params).reduce((text, [name, value]) => text.replaceAll(`{${name}}`, value), template);
+    }
+
+    function toggleLanguage() {
+      state.lang = state.lang === "hi" ? "en" : "hi";
+      applyTranslations();
+      populateStatusFilter();
+      render();
+    }
+
+    function applyTranslations() {
+      document.documentElement.lang = state.lang;
+      document.querySelectorAll("[data-i18n]").forEach(element => {
+        element.textContent = t(element.dataset.i18n);
+      });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+        element.placeholder = t(element.dataset.i18nPlaceholder);
+      });
+      els.languageToggle.textContent = t("languageButton");
+      els.modeLabel.textContent = state.isAdmin ? t("unlocked") : t("locked");
+      els.modalCloseBtn.setAttribute("aria-label", t("closePlotDetails"));
+      if (els.enquiryPlotNumber.textContent !== "-") updateEnquiryTitle(els.enquiryPlotNumber.textContent);
+    }
+
+    function openIntroModal() {
+      els.introModal.classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeIntroModal() {
+      els.introModal.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    function updateEnquiryTitle(plotId) {
+      const title = els.enquiryModal.querySelector("h2");
+      const safePlotId = escapeHTML(plotId);
+      if (title) {
+        title.innerHTML = state.lang === "hi"
+          ? `प्लॉट #<span id="enquiryPlotNumber">${safePlotId}</span> में रुचि है?`
+          : `Interested in Plot #<span id="enquiryPlotNumber">${safePlotId}</span>?`;
+      }
+      els.enquiryPlotNumber = document.getElementById("enquiryPlotNumber");
+    }
+
+    function translateStatus(status) {
+      switch (normalizeStatus(status)) {
+        case "available": return t("available");
+        case "sold": return t("sold");
+        case "in-talk": return t("inTalk");
+        case "pending": return t("pending");
+        case "in-progress": return t("inProgress");
+        case "completed": return t("completed");
+        case "approved": return t("approved");
+        default: return stringifyValue(status) || "-";
+      }
+    }
 
     async function fetchRows() {
       setLoading(true);
@@ -596,11 +805,15 @@
     function populateStatusFilter() {
       const statuses = Array.from(new Set(state.rows.map(row => stringifyValue(row[state.statusKey]).trim()).filter(Boolean))).sort();
       if (!els.statusFilter) return;
-      els.statusFilter.innerHTML = '<option value="">All Assets</option>';
+      els.statusFilter.innerHTML = "";
+      const allOption = document.createElement("option");
+      allOption.value = "";
+      allOption.textContent = t("allAssets");
+      els.statusFilter.appendChild(allOption);
       statuses.forEach(status => {
         const option = document.createElement("option");
         option.value = status;
-        option.textContent = status;
+        option.textContent = translateStatus(status);
         els.statusFilter.appendChild(option);
       });
       if (state.statusFilter) els.statusFilter.value = state.statusFilter;
@@ -677,6 +890,10 @@
           stroke-width: 1.05px !important;
           vector-effect: non-scaling-stroke;
           transition: fill 160ms ease, opacity 160ms ease, stroke 160ms ease;
+          pointer-events: auto !important;
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-user-select: none;
         }
         #Plots-Layer > [id^="plot-"] * {
           stroke: rgba(255,255,255,0.82) !important;
@@ -719,12 +936,18 @@
 
       getPlotShapes().forEach(shape => {
         const plotId = getPlotIdFromElement(shape);
-        shape.addEventListener("click", () => selectPlot(plotId));
+        shape.addEventListener("click", event => {
+          event.preventDefault();
+          showPlotDetailForId(plotId);
+        });
         shape.setAttribute("tabindex", "0");
         shape.setAttribute("role", "button");
         shape.setAttribute("aria-label", `Plot ${plotId}`);
         shape.addEventListener("keydown", event => {
-          if (event.key === "Enter" || event.key === " ") selectPlot(plotId);
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            showPlotDetailForId(plotId);
+          }
         });
       });
 
@@ -847,24 +1070,24 @@
       els.selectedDetails.innerHTML = "";
 
       if (!row) {
-        els.selectedTitle.textContent = "Select a plot";
-        els.selectedBadge.textContent = "None";
+        els.selectedTitle.textContent = t("selectPlot");
+        els.selectedBadge.textContent = t("none");
         els.selectedBadge.className = "rounded-lg bg-slate-100 px-3 py-2 text-xs font-black text-slate-600";
-        els.selectedDetails.innerHTML = '<p class="rounded-lg bg-slate-50 p-4 text-sm font-semibold text-slate-500">Click any colored plot on the layout, or type a plot number above.</p>';
+        els.selectedDetails.innerHTML = `<p class="rounded-lg bg-slate-50 p-4 text-sm font-semibold text-slate-500">${escapeHTML(t("introHelp"))}</p>`;
         return;
       }
 
       const status = stringifyValue(row[state.statusKey]) || "Pending";
       els.selectedTitle.textContent = `Plot #${findRowId(row)}`;
-      els.selectedBadge.textContent = status;
+      els.selectedBadge.textContent = translateStatus(status);
       els.selectedBadge.className = `rounded-lg px-3 py-2 text-xs font-black ${getStatusClasses(status)}`;
 
       const important = [
-        ["Plot Type", row.plottype ?? row["Plot Type"]],
-        ["Dimensions", formatDimensions(row)],
-        ["Area", formatArea(row)],
-        ["Rate", formatMoney(row.ratepersqunit ?? row["Rate Per Sq.Unit"] ?? row.rate)],
-        ["Total", formatMoney(row.totalamount ?? row["Total Amount"] ?? row.amount)]
+        [t("plotType"), row.plottype ?? row["Plot Type"]],
+        [t("dimensions"), formatDimensions(row)],
+        [t("area"), formatArea(row)],
+        [t("rate"), formatMoney(row.ratepersqunit ?? row["Rate Per Sq.Unit"] ?? row.rate)],
+        [t("total"), formatMoney(row.totalamount ?? row["Total Amount"] ?? row.amount)]
       ];
 
       important.forEach(([label, value]) => {
@@ -876,18 +1099,18 @@
 
       const statusWrap = document.createElement("div");
       statusWrap.className = "rounded-lg border border-slate-200 p-3";
-      statusWrap.innerHTML = '<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Status</p>';
+      statusWrap.innerHTML = `<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">${escapeHTML(t("status"))}</p>`;
       statusWrap.appendChild(renderStatusControl(row));
       els.selectedDetails.appendChild(statusWrap);
     }
 
     function getPlotDetailItems(row) {
       return [
-        ["Plot Type", row.plottype ?? row["Plot Type"]],
-        ["Dimensions", formatDimensions(row)],
-        ["Area", formatArea(row)],
-        ["Rate", formatMoney(row.ratepersqunit ?? row["Rate (per sq unit)"] ?? row.rate)],
-        ["Total", formatMoney(row.totalamount ?? row["Total Amount"] ?? row.amount)]
+        [t("plotType"), row.plottype ?? row["Plot Type"]],
+        [t("dimensions"), formatDimensions(row)],
+        [t("area"), formatArea(row)],
+        [t("rate"), formatMoney(row.ratepersqunit ?? row["Rate (per sq unit)"] ?? row.rate)],
+        [t("total"), formatMoney(row.totalamount ?? row["Total Amount"] ?? row.amount)]
       ];
     }
 
@@ -895,7 +1118,7 @@
       const status = stringifyValue(row[state.statusKey]) || "Pending";
       const rowId = findRowId(row);
       els.modalTitle.textContent = `Plot #${rowId}`;
-      els.modalBadge.textContent = status;
+      els.modalBadge.textContent = translateStatus(status);
       els.modalBadge.className = `mb-4 inline-flex rounded-lg px-3 py-2 text-xs font-black ${getStatusClasses(status)}`;
       els.modalDetails.innerHTML = "";
 
@@ -906,29 +1129,30 @@
         els.modalDetails.appendChild(item);
       });
 
+      // Show interested people count for "In Talk" plots
       if (normalizeStatus(status) === "in-talk") {
         const interestedCount = state.interestedCountMap[rowId] || 0;
         const interestedItem = document.createElement("div");
         interestedItem.className = "rounded-lg bg-amber-50 p-3 border border-amber-100";
-        interestedItem.innerHTML = `<p class="text-xs font-black uppercase tracking-wide text-amber-600">Interested People</p><p class="mt-1 text-base font-black text-amber-900">${interestedCount} people</p>`;
+        interestedItem.innerHTML = `<p class="text-xs font-black uppercase tracking-wide text-amber-600">${escapeHTML(t("interestedPeople"))}</p><p class="mt-1 text-base font-black text-amber-900">${interestedCount} ${escapeHTML(t("people"))}</p>`;
         els.modalDetails.appendChild(interestedItem);
 
+        // Show admin control for interested count
         if (state.isAdmin) {
           const adminItem = document.createElement("div");
           adminItem.className = "rounded-lg border border-slate-200 p-3";
-          adminItem.innerHTML = '<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Update Interested Count</p>';
+          adminItem.innerHTML = `<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">${escapeHTML(t("updateInterestedCount"))}</p>`;
           const controlDiv = document.createElement("div");
           controlDiv.className = "flex items-center gap-2";
           const input = document.createElement("input");
           input.type = "number";
           input.min = "0";
           input.value = interestedCount;
-          /* iOS Fix: Using text-base here to prevent native zoom */
-          input.className = "flex-1 h-11 rounded-lg border border-slate-300 px-3 text-base font-bold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100";
+          input.className = "flex-1 h-11 rounded-lg border border-slate-300 px-3 text-sm font-bold text-slate-900 outline-none focus:border-leaf focus:ring-4 focus:ring-emerald-100";
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "h-11 rounded-lg bg-forest px-4 text-sm font-black text-white transition hover:bg-leaf";
-          btn.textContent = "Save";
+          btn.textContent = t("save");
           btn.addEventListener("click", () => updateInterestedCount(rowId, input.value));
           controlDiv.appendChild(input);
           controlDiv.appendChild(btn);
@@ -939,7 +1163,7 @@
 
       const statusWrap = document.createElement("div");
       statusWrap.className = "rounded-lg border border-slate-200 p-3";
-      statusWrap.innerHTML = '<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Status</p>';
+      statusWrap.innerHTML = `<p class="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">${escapeHTML(t("status"))}</p>`;
       statusWrap.appendChild(renderStatusControl(row));
       els.modalDetails.appendChild(statusWrap);
       els.plotModal.classList.remove("hidden");
@@ -951,22 +1175,26 @@
       state.interestedCountMap[plotId] = newCount;
 
       try {
-        await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            type: "updateInterestedCount",
-            plotId: plotId,
-            interestedCount: newCount
-          })
-        });
-        showToast("Interested count updated successfully!", "success");
+        await saveInterestedCount(plotId, newCount);
+        showToast(t("interestedUpdated"), "success");
         const row = getRowById(plotId);
         if (row) openPlotModal(row);
       } catch (error) {
         console.error(error);
-        showToast("Error updating interested count", "error");
+        showToast(t("interestedError"), "error");
       }
+    }
+
+    async function saveInterestedCount(plotId, count) {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          type: "updateInterestedCount",
+          plotId: plotId,
+          interestedCount: count
+        })
+      });
     }
 
     function closePlotModal() {
@@ -981,23 +1209,22 @@
       if (!state.isAdmin) {
         const badge = document.createElement("span");
         badge.className = `inline-flex min-h-10 items-center rounded-lg px-3 py-2 text-sm font-black ${getStatusClasses(currentStatus)}`;
-        badge.textContent = currentStatus;
+        badge.textContent = translateStatus(currentStatus);
         return badge;
       }
 
       const wrap = document.createElement("div");
       wrap.className = "flex min-w-[10rem] items-center gap-2";
       const select = document.createElement("select");
-      /* iOS Fix: Ensure text-base on mobile selects */
       select.className = "status-select min-h-12 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 py-3 pr-9 text-base font-black text-slate-900 outline-none transition focus:border-leaf focus:ring-4 focus:ring-emerald-100 disabled:cursor-wait disabled:opacity-70 lg:min-h-10 lg:py-2 lg:text-sm";
       select.disabled = state.updatingIds.has(rowId);
-      select.setAttribute("aria-label", `Update status for plot ${rowId}`);
+      select.setAttribute("aria-label", `${t("status")} Plot ${rowId}`);
 
       const options = currentStatus && !STATUS_OPTIONS.includes(currentStatus) ? [currentStatus, ...STATUS_OPTIONS] : STATUS_OPTIONS;
       options.forEach(optionValue => {
         const option = document.createElement("option");
         option.value = optionValue;
-        option.textContent = optionValue;
+        option.textContent = translateStatus(optionValue);
         option.selected = currentStatus === optionValue;
         select.appendChild(option);
       });
@@ -1007,7 +1234,7 @@
       if (state.updatingIds.has(rowId)) {
         const spinner = document.createElement("span");
         spinner.className = "loader !h-5 !w-5 !border-2";
-        spinner.setAttribute("aria-label", "Updating status");
+        spinner.setAttribute("aria-label", t("updatingStatus"));
         wrap.appendChild(spinner);
       }
       return wrap;
@@ -1020,7 +1247,7 @@
 
       state.updatingIds.add(rowId);
       render();
-      const pendingToast = showToast("Updating status...", "loading", false);
+      const pendingToast = showToast(t("updatingStatus"), "loading", false);
 
       try {
         const response = await fetch(APPS_SCRIPT_URL, {
@@ -1031,8 +1258,13 @@
         if (!response.ok) throw new Error(`Update failed with status ${response.status}`);
 
         row[state.statusKey] = newStatus;
+        const becameInTalk = normalizeStatus(newStatus) === "in-talk" && normalizeStatus(previousStatus) !== "in-talk";
+        if (becameInTalk && (Number(state.interestedCountMap[rowId]) || 0) < 1) {
+          state.interestedCountMap[rowId] = 1;
+          await saveInterestedCount(rowId, 1);
+        }
         dismissToast(pendingToast);
-        showToast("Status updated successfully!", "success");
+        showToast(t("statusUpdated"), "success");
         if (!els.plotModal.classList.contains("hidden")) {
           openPlotModal(row);
         }
@@ -1040,7 +1272,7 @@
         row[state.statusKey] = previousStatus;
         if (selectEl) selectEl.value = previousStatus;
         dismissToast(pendingToast);
-        showToast("Error updating status", "error");
+        showToast(t("statusError"), "error");
         console.error(error);
       } finally {
         state.updatingIds.delete(rowId);
@@ -1050,6 +1282,7 @@
 
     function openEnquiryModal(plotId) {
       els.enquiryPlotNumber.textContent = plotId;
+      updateEnquiryTitle(plotId);
       els.enquiryForm.reset();
       els.enquiryModal.classList.remove("hidden");
       document.body.classList.add("overflow-hidden");
@@ -1069,7 +1302,7 @@
       const mobile = els.enquiryMobile.value.trim();
 
       if (!name || !address || !mobile) {
-        showToast("Please fill all required fields", "error");
+        showToast(t("requiredFields"), "error");
         return;
       }
 
@@ -1106,8 +1339,9 @@
 
         state.enquirySubmittedThisSession = true;
         closeEnquiryModal();
-        showToast("Enquiry submitted successfully! 🎉", "success");
+        showToast(t("enquirySuccess"), "success");
         
+        // Show plot details after enquiry submission
         const row = getRowById(plotId);
         if (row) {
           setTimeout(() => openPlotModal(row), 500);
@@ -1121,23 +1355,37 @@
       }
     }
 
-    function selectPlot(plotId) {
+    function showPlotDetailForId(plotId) {
       const normalized = String(plotId || "").trim();
       const row = getRowById(normalized);
       if (!row) {
-        showToast(`Plot #${normalized} was not found in the sheet`, "error");
+        showToast(t("plotNotFound", { plot: normalized }), "error");
         return;
       }
       state.selectedId = normalized;
       if (els.plotFinder) els.plotFinder.value = normalized;
       render();
       centerMapPlot(normalized);
-      
+
+      // Show enquiry form if user is not admin and hasn't submitted enquiry this session
       if (!state.isAdmin && !state.enquirySubmittedThisSession) {
         openEnquiryModal(normalized);
       } else {
         openPlotModal(row);
       }
+    }
+
+    function selectPlot(plotId) {
+      const normalized = String(plotId || "").trim();
+      const row = getRowById(normalized);
+      if (!row) {
+        showToast(t("plotNotFound", { plot: normalized }), "error");
+        return;
+      }
+      state.selectedId = normalized;
+      if (els.plotFinder) els.plotFinder.value = normalized;
+      render();
+      centerMapPlot(normalized);
     }
 
     function centerMapPlot(plotId) {
@@ -1193,18 +1441,18 @@
     function handleAdminToggle(event) {
       state.isAdmin = event.target.checked;
       if (event.target.checked) {
-        const password = window.prompt("Enter admin password");
+        const password = window.prompt(t("adminPassword"));
         if (password !== "7024") {
           event.target.checked = false;
           state.isAdmin = false;
-          els.modeLabel.textContent = "Locked";
-          showToast("Incorrect admin password", "error");
+          els.modeLabel.textContent = t("locked");
+          showToast(t("incorrectPassword"), "error");
           render();
           return;
         }
       }
       state.isAdmin = event.target.checked;
-      els.modeLabel.textContent = state.isAdmin ? "Unlocked" : "Locked";
+      els.modeLabel.textContent = state.isAdmin ? t("unlocked") : t("locked");
       render();
     }
 
@@ -1325,7 +1573,7 @@
     }
 
     function showError(message) {
-      els.errorMessage.textContent = `${message}. Confirm that the web app is deployed for public access and returns JSON.`;
+      els.errorMessage.textContent = `${message}. ${t("loadErrorSuffix")}`;
       els.errorState.classList.remove("hidden");
     }
 
